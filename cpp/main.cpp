@@ -7,7 +7,7 @@ int main()
 {
 	using namespace std;
 	double ar[] = {0.5, 1, 0, 1.57};
-	solid_angle omega;//(ar, 0.02, 0.02 );
+	solid_angle omega(ar, 0.02, 0.02 );
 	omega.show();
 	
 	
@@ -76,6 +76,7 @@ int main()
 	for (int i=0; i<spec.y_vec.size(); i++)
 		fout << spec.y_vec[i] << " ";
 	fout << endl;
+	spec.out(fout);
 	fout.close();
 	
 	spec.show();

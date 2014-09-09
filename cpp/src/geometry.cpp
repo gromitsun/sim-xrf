@@ -174,22 +174,26 @@ void solid_angle::update()
 
 void solid_angle::show() const
 {
-	using std::cout;
-	using std::endl;
-	cout << "angle range: ";
+	out(std::cout);
+}
+
+void solid_angle::out(std::ostream & ost) const
+{
+	ost << "angle range: ";
 	for (int i = 0; i < 4; i++)
-		cout << angle_range[i] << ' ';
-	cout << endl;
-	cout << "theta_inc = " << _theta_inc << endl;
-	cout << "beta_inc = " << _beta_inc << endl;
-	cout << "theta: ";
+		ost << angle_range[i] << ' ';
+	ost << std::endl;
+	ost << "theta_inc = " << _theta_inc << std::endl;
+	ost << "beta_inc = " << _beta_inc << std::endl;
+	ost << "theta: ";
 	for (vector<double>::const_iterator i = theta.begin(); i < theta.end(); i++)
-		cout << *i << ' ';
-	cout << endl;
-	cout << "beta: ";
+		ost << *i << ' ';
+	ost << std::endl;
+	ost << "beta: ";
 	for (vector<double>::const_iterator i = beta.begin(); i < beta.end(); i++)
-		cout << *i << ' ';
-	cout << endl;
+		ost << *i << ' ';
+	ost << std::endl;
+	ost << "Total subtended solid angle: " << subtend << std::endl;
 }
 
 double atten_mono(const double & ev0, 
