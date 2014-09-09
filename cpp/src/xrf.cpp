@@ -39,7 +39,7 @@ vector<int> mac_xrf(double ev0, int Z, vector<double> & ev_vec, vector<double> &
 		double ev = LineEnergy(Z, line)*1e3;
 		if (ev > 1e-6)
 		{
-			double y = CS_FluorLine_Kissel_Cascade(Z, line, ev0);
+			double y = CS_FluorLine_Kissel_Cascade(Z, line, ev0/1e3);
 			if (y > 1e-50)
 			{
 				ev_vec.push_back(ev);

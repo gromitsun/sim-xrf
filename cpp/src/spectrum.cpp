@@ -114,7 +114,7 @@ void Xrf::add(const Xrf & x, bool mat_only)
 	int Z, n_pixels;
 	std::vector<int>::const_iterator Z_iter;
 	if (!x.y_mat.empty())
-		n_pixels = x.omega.theta.size()*x.omega.beta.size();
+		n_pixels = omega.theta.size()*omega.beta.size();
 	for (int i = 0; i < x.Z_vec.size(); i++)
 	{
 		Z = x.Z_vec[i];
@@ -122,7 +122,6 @@ void Xrf::add(const Xrf & x, bool mat_only)
 		if (Z_iter != Z_vec.end())
 		{
 			int p = Z_iter - Z_vec.begin();
-			std::cout << "Z = " << Z << ", p = " << p << std::endl;
 			if (!mat_only)
 			{
 				std::vector<double>::const_iterator i2 = x.y_vec.begin()+x.row[i];
@@ -328,23 +327,24 @@ Compton::Compton(const Sample & s, const Illumination & il, const solid_angle & 
 {
 	_ev0 = il.ev0;
 	_omega = omega_;
+	ev();
 	for (std::vector<Monolayer>::const_iterator layer = s.layer_vec.begin(); layer < s.layer_vec.end(); layer++)
 	{
 		std::cout << "Calculating Compton scattering for layer " << (*layer).layer << std::endl;
 		Compton *temp_p = new Compton(il.ev0, *layer, omega, false, false), & temp = *temp_p;
 		std::cout << "Calculating Compton scattering attenuation for layer " << (*layer).layer << std::endl;
 		int i = 0;
-		for (std::vector<double>::const_iterator theta = omega.theta.begin(); theta < omega.theta.end(); theta++)
+		for (std::vector<double>::const_iterator theta = omega.theta.begin(), ev = ev_vec.begin(); theta < omega.theta.end(); theta++, ev++)
 		{
 			for (std::vector<double>::const_iterator beta = omega.beta.begin(); beta < omega.beta.end(); beta++)
 			{
 				double psiprime = il.psi_prime(*theta, *beta);
 				//attenuation within the layer
-				temp._y_mat[i] *= atten_mono(il.ev0, il.ev0, il.psi, psiprime, *layer);
+				temp._y_mat[i] *= atten_mono(il.ev0, *ev, il.psi, psiprime, *layer);
 				if (psiprime > 0) //reflection geometry
 					//attenuation from layers upstream
 					for (std::vector<Monolayer>::const_iterator layer_up = s.layer_vec.begin(); layer_up < layer; layer_up++)
-						temp._y_mat[i] *= atten_refl(il.ev0, il.ev0, il.psi, psiprime, *layer_up);
+						temp._y_mat[i] *= atten_refl(il.ev0, *ev, il.psi, psiprime, *layer_up);
 				else if (psiprime < 0) //transmission geometry
 				{
 					//attenuation from layers upstream
@@ -352,25 +352,15 @@ Compton::Compton(const Sample & s, const Illumination & il, const solid_angle & 
 						temp._y_mat[i] *= atten_trans_in(il.ev0, il.psi, *layer_up);
 					//attenuation from layers downstream
 					for (std::vector<Monolayer>::const_iterator layer_down = layer+1; layer_down < s.layer_vec.end(); layer_down++)
-						temp._y_mat[i] *= atten_trans_out(il.ev0, psiprime, *layer_down);
+						temp._y_mat[i] *= atten_trans_out(*ev, psiprime, *layer_down);
 				}
 				i++;
 			}
 		}
 		add(temp, true);
-		// temp.sum_ev();
-		// for (std::vector<double>::const_iterator xx = y_mat.begin(); xx < y_mat.end(); xx++)
-		// {
-			// if (*xx < 1e-50)
-			// std::cout << *xx << " ";
-		// }
-		// std::cout << std::endl;
-		// int ttt;
-		// std::cin >> ttt;
-		// temp.show();
 		delete temp_p;
 	}
-	sum_ev();
+	sum();
 }
 
 
@@ -464,9 +454,9 @@ Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle 
 	
 	_y_vec.clear();
 	_y_vec.resize(detector.channel.n_channels);
-	detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec, false, false);
-	detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, false, false);
-	detector.genspec(illumination.ev0, ray.y, _y_vec, false, false);
+	detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
+	detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
+	detector.genspec(illumination.ev0, ray.y, _y_vec);
 }
 
 Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, const Detector & det) 

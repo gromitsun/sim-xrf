@@ -198,7 +198,7 @@ double atten_mono(const double & ev0,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
-	if (psiprime == 0)
+	if ((psiprime < 1e-6) && (psiprime > -1e-6))
 		return 0;
 	double mac0 = ml.mac_tot(ev0);
 	double mac1 = ml.mac_tot(ev);
@@ -207,6 +207,8 @@ double atten_mono(const double & ev0,
 	double t = ml.thickness;
 	double rho = ml.density;
 	double temp = (mac0/sp0+mac1/sp1)*rho;
+	if (mac0+mac1*sp0/sp1 < 1e-50 && mac0+mac1*sp0/sp1 > -1e-50)
+		return 0;
 	if (psiprime > 0)
 		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/((mac0+mac1*sp0/sp1)*rho);
 	else

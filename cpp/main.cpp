@@ -1,11 +1,14 @@
 #include <iostream>
+#include <fstream>
 
 #include "spectrum.hpp"
 
 int main()
 {
 	using namespace std;
-	solid_angle omega;
+	double ar[] = {0.5, 1, 0, 1.57};
+	solid_angle omega;//(ar, 0.02, 0.02 );
+	omega.show();
 	
 	
 	
@@ -68,10 +71,13 @@ int main()
 	// Xrf xrf(1e4, c, omega);
 	// xrf.show();
 	
-	
+	ofstream fout;
+	fout.open("out.txt");
 	for (int i=0; i<spec.y_vec.size(); i++)
-		cout << spec.y_vec[i] << " ";
-	cout << endl;
+		fout << spec.y_vec[i] << " ";
+	fout << endl;
+	fout.close();
+	
 	spec.show();
 	cout << spec.xrf.lines.size() << endl;
 
