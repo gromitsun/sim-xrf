@@ -1,0 +1,51 @@
+#Input file
+Sample:
+	layer 1:
+		Z = 29, 6, 8, 16
+		p = 1, 20, 10, 2
+		density = 1
+		thickness = 2e-4
+		
+	layer 2:
+		Z = 30, 6, 8, 16
+		p = 1, 20, 10, 2
+		density = 1.05
+		thickness = 3e-4
+		
+	layer 3:
+		Z = 26, 6, 8, 16
+		p = 1, 20, 10, 2
+		density = 2
+		thickness = 5e-4
+		
+		
+Detector:
+	Channel:
+		ev_offset = 0
+		ev_gain = 10
+		n_channels = 2048
+	Response:
+		noise = 100
+		fano = 0.114
+		gamma = 2.5
+		fs = 0.03
+		ft = 0.02
+	Window:
+		material = Be
+		thickness = 24e-4
+		density = 1	
+		
+		
+Illumination:
+	ev0 = 1e4
+	psi = 45
+	alpha = 0
+
+Solid angle:
+	angle_range = 80, 100, 0, 180
+	theta_inc = 1
+	beta_inc = 1
+
+
+	
+		

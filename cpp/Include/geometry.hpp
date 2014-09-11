@@ -3,6 +3,7 @@
 #define GEOMETRY_HPP
 
 #include <vector>
+#include <ostream>
 #include "constants.hpp"
 #include "sample.hpp"
 
@@ -49,6 +50,7 @@ public:
 	const double & subtend;
 	double domega(const double & theta, const double & beta) const;
 	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 double atten_mono(const double & ev0, 

@@ -36,6 +36,7 @@ public:
 	void add(const Xrf & x, bool mat_only = false);
 	void sum();
 	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class Rayleigh
@@ -59,6 +60,7 @@ public:
 	void add(const Rayleigh & x, bool mat_only = false);
 	void sum();
 	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class Compton
@@ -86,6 +88,7 @@ public:
 	void ev();
 	void sum_ev();
 	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class Spectrum
@@ -130,6 +133,7 @@ public:
 	void genspec(bool det_response = true);
 	// void genspec_raw(std::vector<double> & ev_vec_, std::vector<double> & y_vec_);	
 	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 	

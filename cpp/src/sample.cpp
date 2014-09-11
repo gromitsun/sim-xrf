@@ -64,10 +64,37 @@ double Compound::dmac_compton_pol(const double & ev, const double & theta, const
 	return dmac;
 }
 
+void Compound::show() const
+{
+	out(std::cout);
+}
+
+void Compound::out(std::ostream & ost) const
+{
+	ost << "Z = ";
+	for (auto Z : Z_vec)
+		ost << Z << ", ";
+	ost << std::endl;
+	
+	ost << "p = ";
+	for (auto p : p_vec)
+		ost << p << ", ";
+	ost << std::endl;
+	
+	ost << "Molecular weight = ";
+	ost << molecular_weight;
+	ost << std::endl;
+}
+
 //Monolayer
 Monolayer::Monolayer() : Compound::Compound(), density(_density), thickness(_thickness), layer(_layer)
 {
 
+}
+
+Monolayer::Monolayer(const Monolayer & ml) : Compound::Compound(), density(_density), thickness(_thickness), layer(_layer)
+{
+	operator=(ml);
 }
 
 Monolayer::Monolayer(const std::vector<int> & _Z_vec, const std::vector<double> & _p_vec, const double & density_, const double & thickness_, const double & layer_) : Compound::Compound(_Z_vec, _p_vec), density(_density), thickness(_thickness), layer(_layer)
@@ -99,10 +126,22 @@ void Monolayer::set_layer(int i)
 	_layer = i;
 }
 
+void Monolayer::show() const
+{
+	out(std::cout);
+}
+
+void Monolayer::out(std::ostream & ost) const
+{
+	ost << "Parameters for layer #" << layer << ":" << std::endl;
+	Compound::out(ost);
+	ost << "density = " << density << std::endl;
+	ost << "thickness = " << thickness << std::endl;
+}
+
 //Sample
 Sample::Sample() : layer_vec(_layer_vec), nlayers(_nlayers)
 {
-	// _layer_vec = layer_vec_;
 	update();
 }
 
@@ -130,6 +169,21 @@ void Sample::update()
 void Sample::add_layer(const Monolayer & monolayer_)
 {
 	_layer_vec.push_back(monolayer_);
-	(*(_layer_vec.end()-1)).set_layer(nlayers);
+	if (monolayer_.layer == 0)
+		_layer_vec.back().set_layer(nlayers);
 	_nlayers++;
+}
+
+void Sample::show() const
+{
+	out(std::cout);
+}
+
+void Sample::out(std::ostream & ost) const
+{
+	ost << "******* Sample parameters: *******" << std::endl;
+	ost << "Total number of layers = " << nlayers << std::endl;
+	for (auto m : layer_vec)
+		m.out(ost);
+	ost << "******* End of sample parameters *******" << std::endl;
 }
