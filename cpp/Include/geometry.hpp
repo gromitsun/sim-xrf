@@ -26,6 +26,8 @@ public:
 	const double & psi;
 	const double & alpha;
 	double psi_prime(const double & theta, const double & beta) const;
+	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class solid_angle

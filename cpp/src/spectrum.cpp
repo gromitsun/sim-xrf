@@ -175,18 +175,25 @@ void Xrf::out(std::ostream & ost) const
 	ev = ev_vec.begin();
 	line = lines.begin();
 	
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # XRF lines: # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 	for (Z = Z_vec.begin(); Z < Z_vec.end(); Z++)
 	{
-		ost << "******* XRF lines for " << AtomicNumberToSymbol(*Z) << " (" << *Z << ") : *******" << std::endl;
+		ost << "# ======================================== #" << std::endl;
+		ost << "# Z = " << *Z <<  " (" << AtomicNumberToSymbol(*Z) << ")" << std::endl;
+		ost << "# Line#\tE0(eV)\tIntensity\n";
+		ost << "# ======================================== #" << std::endl;
 		for (int i=(*r); i<(*(r+1)); i++)
 		{
-			ost << "line " << *(line++) << ", ";
-			ost << *(ev++) << " eV, ";
-			ost << "intensity " << *(y++) << std::endl;
+			ost << *(line++) << "\t";
+			ost << *(ev++) << "\t";
+			ost << *(y++) << std::endl;
 		}
+		ost << "# ======================================== #" << std::endl;
 		r++;
 	}
-	ost << "******* End *******" << std::endl;
+	ost << "# # # # # End of XRF # # # # #" << std::endl;
 }
 
 Rayleigh::Rayleigh()
@@ -291,10 +298,12 @@ void Rayleigh::show() const
 
 void Rayleigh::out(std::ostream & ost) const
 {
-	ost << "******* Rayleigh scattering *******" << std::endl;
-	ost << "Peak @ " << ev0 << std::endl;
-	ost << "Intensity: " << y << std::endl;
-	ost << "******* End *******" << std::endl;
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # Rayleigh scattering # # # # #" << std::endl;
+	ost << "# Peak @ " << ev0 << std::endl;
+	ost << "# Intensity: " << y << std::endl;
+	ost << "# # # # # End of Rayleigh scattering # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 }
 
 
@@ -446,10 +455,12 @@ void Compton::show() const
 
 void Compton::out(std::ostream & ost) const
 {
-	ost << "******* Compton scattering *******" << std::endl;
-	ost << "Energy range " << ev_vec.back() << " - " << ev_vec.front() << std::endl;
-	ost << "Total intensity: " << std::accumulate(y_vec.begin(), y_vec.end(), 0.0) << std::endl;
-	ost << "******* End *******" << std::endl;
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # Compton scattering # # # # #" << std::endl;
+	ost << "# Energy range: " << ev_vec.back() << " - " << ev_vec.front() << std::endl;
+	ost << "# Total intensity: " << std::accumulate(y_vec.begin(), y_vec.end(), 0.0) << std::endl;
+	ost << "# # # # # End of Compton scattering # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 }
 
 Spectrum::Spectrum() 
@@ -499,7 +510,22 @@ void Spectrum::show() const
 
 void Spectrum::out(std::ostream & ost) const
 {
+	if (ost != std::cout)
+	{
+		ost << "# Total spectrum for each channel " << std::endl;
+		for (auto i : y_vec)
+			ost << i << "\t";
+		ost << std::endl;
+		ost << std::endl;
+	}
+	
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # Spectrum: # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 	xrf.out(ost);
 	ray.out(ost);
 	comp.out(ost);
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # End of spectrum # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 }

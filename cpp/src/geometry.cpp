@@ -30,6 +30,20 @@ Illumination & Illumination::operator=(const Illumination & il)
 	return *this;
 }
 
+void Illumination::show() const
+{
+	out(std::cout);
+}
+void Illumination::out(std::ostream & ost) const
+{
+	ost << "# # # # # Illumination: # # # # #*" << std::endl;
+	ost << "ev0 = " << ev0 << std::endl;
+	ost << "psi = " << psi << std::endl;
+	ost << "alpha = " << alpha << std::endl;
+	ost << "# # # # # End of illumination # # # # #*" << std::endl;
+	
+}
+
 
 void spherical2cartesian(const double & r, const double & theta, const double & beta, double & x, double & y, double & z) //Convert spherical coordinates (r,theta,beta) to Cartesian coordinates (x,y,z).
 {
@@ -202,16 +216,18 @@ double atten_mono(const double & ev0,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
-	if ((psiprime < 1e-6) && (psiprime > -1e-6))
+	if ((psiprime < 1e-6) && (psiprime > -1e-6)) // Check if psiprime == 0
 		return 0;
+	double t = ml.thickness;
+	double rho = ml.density;
+	if (t == 0 || rho == 0)
+		return 1;
 	double mac0 = ml.mac_tot(ev0);
 	double mac1 = ml.mac_tot(ev);
 	double sp0 = std::sin(psi);
 	double sp1 = std::sin(psiprime);
-	double t = ml.thickness;
-	double rho = ml.density;
 	double temp = (mac0/sp0+mac1/sp1)*rho;
-	if (mac0+mac1*sp0/sp1 < 1e-50 && mac0+mac1*sp0/sp1 > -1e-50)
+	if (mac0+mac1*sp0/sp1 < 1e-50 && mac0+mac1*sp0/sp1 > -1e-50) // To avoid division by zero
 		return 0;
 	if (psiprime > 0)
 		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/((mac0+mac1*sp0/sp1)*rho);
@@ -225,6 +241,10 @@ double atten_refl(const double & ev0,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
+	double t = ml.thickness;
+	double rho = ml.density;
+	if (t == 0 || rho == 0)
+		return 0;
 	return std::exp(-(ml.mac_tot(ev0)/std::sin(psi)+ml.mac_tot(ev)/std::sin(psiprime))*ml.density*ml.thickness);
 }		
 		
@@ -232,6 +252,8 @@ double atten_trans_in(const double & ev0,
 		const double & psi, 
 		const Monolayer & ml)
 {
+	if (ml.density == 0 || ml.thickness == 0)
+		return 1;
 	return std::exp(-ml.mac_tot(ev0)/std::sin(psi)*ml.density*ml.thickness);
 }		
 		
@@ -239,5 +261,7 @@ double atten_trans_out(const double & ev,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
+	if (ml.density == 0 || ml.thickness == 0)
+		return 1;
 	return std::exp(ml.mac_tot(ev)/std::sin(psiprime)*ml.density*ml.thickness);
 }

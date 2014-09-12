@@ -181,9 +181,9 @@ void Sample::show() const
 
 void Sample::out(std::ostream & ost) const
 {
-	ost << "******* Sample parameters: *******" << std::endl;
+	ost << "# # # # # Sample parameters: # # # # #" << std::endl;
 	ost << "Total number of layers = " << nlayers << std::endl;
 	for (auto m : layer_vec)
 		m.out(ost);
-	ost << "******* End of sample parameters *******" << std::endl;
+	ost << "# # # # # End of sample parameters # # # # #" << std::endl;
 }
