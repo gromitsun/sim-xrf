@@ -33,7 +33,7 @@ public:
 class solid_angle
 {
 private:
-	double angle_range[4];
+	double _angle_range[4];
 	std::vector<double> _theta;
 	std::vector<double> _beta;
 	double _theta_inc;
@@ -47,8 +47,11 @@ public:
 	solid_angle & operator=(const solid_angle & sa);
 	// const std::vector<double> & get_theta(double th_inc = -1);
 	// const std::vector<double> & get_beta(double be_inc = -1);
+	const double* const angle_range = _angle_range;
 	const std::vector<double> & theta;
 	const std::vector<double> & beta;
+	const double & theta_inc;
+	const double & beta_inc;
 	const double & subtend;
 	double domega(const double & theta, const double & beta) const;
 	void show() const;

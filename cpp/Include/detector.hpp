@@ -22,6 +22,8 @@ public:
 	int ev_to_channel(double ev) const;
 	void bin(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned) const;
 	void bin(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned) const;
+	void bin(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, const std::vector<int> & row) const;
+	void bin(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate) const;
 };
 
 class Response
@@ -87,6 +89,8 @@ public:
 	const Window & window;
 	void genspec(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned, bool det_response = true, bool det_window = true) const;
 	void genspec(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, bool det_response = true, bool det_window = true) const;
+	void genspec(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, const std::vector<int> & row, bool det_response = true, bool det_window = true) const;
+	void genspec(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, bool det_response = true, bool det_window = true) const;
 };
 
 #endif

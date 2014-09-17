@@ -16,17 +16,17 @@ vector<int> mac_xrf(double ev0, int Z, vector<double> & ev_vec, vector<double> &
 {
 	vector<int> lines;
 	int line_start;
-	if (ev0 >= EdgeEnergy(Z, K_SHELL))
+	if (ev0 >= 1e3*EdgeEnergy(Z, K_SHELL))
 		line_start = -1;
-	else if (line_end <= L_LINES && ev0 >= EdgeEnergy(Z, L3_SHELL))
+	else if (line_end <= L_LINES && ev0 >= 1e3*EdgeEnergy(Z, L3_SHELL))
 		line_start = K_LINES-1;
-	else if (line_end <= M_LINES && ev0 >= EdgeEnergy(Z, M5_SHELL))
+	else if (line_end <= M_LINES && ev0 >= 1e3*EdgeEnergy(Z, M5_SHELL))
 		line_start = L_LINES-1;
-	else if (line_end <= N_LINES && ev0 >= EdgeEnergy(Z, N7_SHELL))
+	else if (line_end <= N_LINES && ev0 >= 1e3*EdgeEnergy(Z, N7_SHELL))
 		line_start = M_LINES-1;
-	else if (line_end <= O_LINES && ev0 >= EdgeEnergy(Z, O7_SHELL))
+	else if (line_end <= O_LINES && ev0 >= 1e3*EdgeEnergy(Z, O7_SHELL))
 		line_start = N_LINES-1;	
-	else if (line_end <= P_LINES && ev0 >= EdgeEnergy(Z, P5_SHELL))
+	else if (line_end <= P_LINES && ev0 >= 1e3*EdgeEnergy(Z, P5_SHELL))
 		line_start = N_LINES-1;
 	else 
 	{

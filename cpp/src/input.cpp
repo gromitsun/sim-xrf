@@ -243,10 +243,6 @@ void readfile(std::string filename, Sample & sp, Illumination & il, solid_angle 
 					}
 				}
 			}
-			std::cout << theta_inc << " " << beta_inc << std::endl;
-			for (auto i : ar)
-				std::cout << i << " ";
-			std::cout << std::endl;
 			omega = solid_angle(ar.data(), theta_inc, beta_inc);
 		}
 	}

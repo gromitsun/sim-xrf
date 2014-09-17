@@ -95,6 +95,7 @@ class Spectrum
 {
 private:
 	std::vector<double> _y_vec;
+	std::vector<double> _y_sep;
 	// std::vector<int> _Z_vec;
 	// std::vector<int> _lines;
 	// std::vector<int> _row;
@@ -107,12 +108,13 @@ private:
 	Detector _detector;
 public:
 	Spectrum();
-	Spectrum(const Sample & s, const Illumination & il, const solid_angle & omega, const Detector & det);
-	Spectrum(double ev0, const Compound & c, const solid_angle & omega, const Detector & det);
+	Spectrum(const Sample & s, const Illumination & il, const solid_angle & omega, const Detector & det, bool det_response = true, bool det_window = true, bool separate = false);
+	Spectrum(double ev0, const Compound & c, const solid_angle & omega, const Detector & det, bool det_response = true, bool det_window = true, bool separate = false);
 	// ~Spectrum();
 	Spectrum & operator=(const Spectrum & s);	
 	
 	const std::vector<double> & y_vec;
+	const std::vector<double> & y_sep;
 	const std::vector<int> & Z_vec;
 	const std::vector<int> & lines;
 	const std::vector<int> & row;

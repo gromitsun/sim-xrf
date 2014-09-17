@@ -464,10 +464,10 @@ void Compton::out(std::ostream & ost) const
 }
 
 Spectrum::Spectrum() 
-	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row) {}
+	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row), y_sep(_y_sep) {}
 
-Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle & omega_, const Detector & det) 
-	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row)
+Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle & omega_, const Detector & det, bool det_response, bool det_window, bool separate) 
+	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row), y_sep(_y_sep)
 {
 	_omega = omega_;
 	_illumination = il;
@@ -480,13 +480,23 @@ Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle 
 	
 	_y_vec.clear();
 	_y_vec.resize(detector.channel.n_channels);
-	detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
-	detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
-	detector.genspec(illumination.ev0, ray.y, _y_vec);
+	if (!separate)
+	{
+		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
+		detector.genspec(illumination.ev0, ray.y, _y_vec);
+	}
+	else
+	{
+		std::vector<int> row_temp{0, -1};
+		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec, _y_sep, xrf.row);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
+		detector.genspec(illumination.ev0, ray.y, _y_vec, _y_sep);
+	}
 }
 
-Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, const Detector & det) 
-	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row)
+Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, const Detector & det, bool det_response, bool det_window, bool separate) 
+	: y_vec(_y_vec), xrf(_xrf), ray(_ray), comp(_comp), omega(_omega), sample(_sample), illumination(_illumination), detector(_detector), Z_vec(xrf.Z_vec), lines(xrf.lines), row(xrf.row), y_sep(_y_sep)
 {
 	_omega = omega_;
 	_detector = det;
@@ -498,9 +508,19 @@ Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, c
 	_y_vec.clear();
 	_y_vec.resize(detector.channel.n_channels);
 	std::cout << "Generating detector binned spectra..." << std::endl;
-	detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
-	detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
-	detector.genspec(illumination.ev0, ray.y, _y_vec);
+	if (!separate)
+	{
+		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
+		detector.genspec(illumination.ev0, ray.y, _y_vec);
+	}
+	else
+	{
+		std::vector<int> row_temp{0, -1};
+		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec, _y_sep, xrf.row);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
+		detector.genspec(illumination.ev0, ray.y, _y_vec, _y_sep);
+	}
 }
 
 void Spectrum::show() const
@@ -517,6 +537,22 @@ void Spectrum::out(std::ostream & ost) const
 			ost << i << "\t";
 		ost << std::endl;
 		ost << std::endl;
+		if (!y_sep.empty())
+		{
+			ost << "# Separate spectra for each channel " << std::endl;
+			int j = 0;
+			for (auto i : y_sep)
+			{
+				ost << i << "\t";
+				if (++j == y_vec.size())
+				{
+					ost << std::endl;
+					ost << std::endl;
+					j = 0;
+				}
+			}
+			ost << std::endl;
+		}
 	}
 	
 	ost << "# ======================================== #" << std::endl;

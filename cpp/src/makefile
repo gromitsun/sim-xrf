@@ -16,20 +16,22 @@ else
 	DLIB = so
 endif
 
+g++ = g++
+
 
 all: $(OBJ_FILES) cwrapper.o
 	ar crf ../Lib/libsim.a $(OBJ_FILES) cwrapper.o
-	g++ $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o ../Lib/libsim.$(DLIB)
+	$(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o ../Lib/libsim.$(DLIB)
 	
 %.o: %.cpp
 	@echo "============="
 	@echo "Compiling $<"
-	@g++ -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11
+	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11
 	
 cwrapper.o: cwrapper.cc
 	@echo "============="
 	@echo "Compiling $<"
-	@g++ -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11
+	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11
 
 clean:
 	$(RM) -rf *.o *.$(DLIB) *.a all

@@ -103,20 +103,20 @@ double Illumination::psi_prime(const double & theta, const double & beta) const
 }
 	
 // solid_angle
-solid_angle::solid_angle():theta(_theta), beta(_beta), subtend(_subtend)
+solid_angle::solid_angle():theta(_theta), beta(_beta), subtend(_subtend), theta_inc(_theta_inc), beta_inc(_beta_inc)//, angle_range(_angle_range)
 {
-	angle_range[0] = 0;
-	angle_range[1] = Pi;
-	angle_range[2] = 0;
-	angle_range[3] = Pi/2;
+	_angle_range[0] = 0;
+	_angle_range[1] = Pi;
+	_angle_range[2] = 0;
+	_angle_range[3] = Pi/2;
 	_theta_inc = Pi/180;
 	_beta_inc = Pi/180;
 	update();
 }
-solid_angle::solid_angle(const double *ar, double th_inc, double be_inc):theta(_theta), beta(_beta), subtend(_subtend)
+solid_angle::solid_angle(const double *ar, double th_inc, double be_inc):theta(_theta), beta(_beta), subtend(_subtend), theta_inc(_theta_inc), beta_inc(_beta_inc)//, angle_range(_angle_range)
 {
 	for (int i=0; i<4; i++)
-		angle_range[i] = ar[i];
+		_angle_range[i] = ar[i];
 	_theta_inc = th_inc;
 	_beta_inc = be_inc;
 	update();
@@ -131,7 +131,7 @@ solid_angle & solid_angle::operator=(const solid_angle & sa)
 	if (this == &sa)
 		return *this;
 	for (int i=0; i<4; i++)
-		angle_range[i] = sa.angle_range[i];
+		_angle_range[i] = sa.angle_range[i];
 	_theta_inc = sa._theta_inc;
 	_beta_inc = sa._beta_inc;
 	update();
