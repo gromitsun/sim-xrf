@@ -5,10 +5,13 @@
 #include <iostream>
 #include <numeric> //std::accumulate
 #include <algorithm> //std::find
+#include <omp.h>
 
 #include "xraylib.h"
 #include "xrf.hpp"
 #include "cs.hpp"
+
+#define mp 1
 
 Xrf::Xrf() : ev_vec(_ev_vec), y_vec(_y_vec), lines(_lines), Z_vec(_Z_vec), row(_row), y_mat(_y_mat), omega(_omega) {}
 
@@ -58,32 +61,36 @@ Xrf::Xrf(const Sample & s, const Illumination & il, const solid_angle & omega_)
 {
 	_omega = omega_;
 	_row.push_back(0);
+	int n_pixels = omega.theta.size()*omega.beta.size();
 	for (std::vector<Monolayer>::const_iterator layer = s.layer_vec.begin(); layer < s.layer_vec.end(); layer++)
 	{
 		std::cout << "Calculating XRF for layer " << (*layer).layer << std::endl;
 		Xrf *temp_p = new Xrf(il.ev0, *layer), & temp = *temp_p;
 		std::cout << "Calculating XRF attenuation for layer " << (*layer).layer << std::endl;
+		temp._y_mat.resize(temp.lines.size()*n_pixels,0);
+		#pragma omp parallel for collapse(3)
 		for (int line=0; line < temp.lines.size(); line++)
 		{
-			for (std::vector<double>::const_iterator theta = omega.theta.begin(); theta < omega.theta.end(); theta++)
+			for (int theta = 0; theta < omega.theta.size(); theta++)
 			{
-				for (std::vector<double>::const_iterator beta = omega.beta.begin(); beta < omega.beta.end(); beta++)
+				for (int beta = 0; beta < omega.beta.size(); beta++)
 				{
-					double psiprime = il.psi_prime(*theta, *beta);
+					double psiprime = il.psi_prime(omega.theta[theta], omega.beta[beta]);
+					int i = line*n_pixels+theta*omega.beta.size()+beta; // the matrix pixel identifier in y_mat
 					//attenuation within the layer
-					temp._y_mat.push_back(temp.y_vec[line]*atten_mono(il.ev0, temp.ev_vec[line], il.psi, psiprime, *layer)*omega.domega(*theta,*beta)/(4*Pi));
+					temp._y_mat[i] = temp.y_vec[line]*atten_mono(il.ev0, temp.ev_vec[line], il.psi, psiprime, *layer)*omega.domega(omega.theta[theta],omega.beta[beta])/(4*Pi);
 					if (psiprime > 0) //reflection geometry
 						//attenuation from layers upstream
 						for (std::vector<Monolayer>::const_iterator layer_up = s.layer_vec.begin(); layer_up < layer; layer_up++)
-							temp._y_mat.back() *= atten_refl(il.ev0, temp.ev_vec[line], il.psi, psiprime, *layer_up);
+							temp._y_mat[i] *= atten_refl(il.ev0, temp.ev_vec[line], il.psi, psiprime, *layer_up);
 					else if (psiprime < 0) //transmission geometry
 					{
 						//attenuation from layers upstream
 						for (std::vector<Monolayer>::const_iterator layer_up = s.layer_vec.begin(); layer_up < layer; layer_up++)
-							temp._y_mat.back() *= atten_trans_in(il.ev0, il.psi, *layer_up);
+							temp._y_mat[i] *= atten_trans_in(il.ev0, il.psi, *layer_up);
 						//attenuation from layers downstream
 						for (std::vector<Monolayer>::const_iterator layer_down = layer+1; layer_down < s.layer_vec.end(); layer_down++)
-							temp._y_mat.back() *= atten_trans_out(temp.ev_vec[line], psiprime, *layer_down);
+							temp._y_mat[i] *= atten_trans_out(temp.ev_vec[line], psiprime, *layer_down);
 					}
 				}
 			}
@@ -115,6 +122,7 @@ void Xrf::add(const Xrf & x, bool mat_only)
 	std::vector<int>::const_iterator Z_iter;
 	if (!x.y_mat.empty())
 		n_pixels = omega.theta.size()*omega.beta.size();
+	// #pragma omp parallel for
 	for (int i = 0; i < x.Z_vec.size(); i++)
 	{
 		Z = x.Z_vec[i];
@@ -125,27 +133,42 @@ void Xrf::add(const Xrf & x, bool mat_only)
 			if (!mat_only)
 			{
 				std::vector<double>::const_iterator i2 = x.y_vec.begin()+x.row[i];
-				for (std::vector<double>::iterator i1 = _y_vec.begin()+row[p];
-					i1 < _y_vec.begin()+row[p+1]; i1++, i2++)
-					*i1 += *i2;
+				std::vector<double>::iterator i1 = _y_vec.begin()+row[p];
+				#pragma omp parallel for
+				for (int j = 0;	j < row[p+1]-row[p]; j++)
+					*(i1+j) += *(i2+j);
 			}
 			if (n_pixels >= 1)
 			{
 				std::vector<double>::const_iterator i2 = x.y_mat.begin()+x.row[i]*n_pixels;
-				for (std::vector<double>::iterator i1 = _y_mat.begin()+row[p]*n_pixels;
-					i1 < _y_mat.begin()+row[p+1]*n_pixels; i1++, i2++)
-					*i1 += *i2;
+				std::vector<double>::iterator i1 = _y_mat.begin()+row[p]*n_pixels;
+				#pragma omp parallel for
+				for (int j = 0;	j < (row[p+1] - row[p])*n_pixels; j++)
+					*(i1+j) += *(i2+j);
 			}
 		}
 		else
 		{
-			_Z_vec.push_back(Z);
-			_lines.insert(_lines.end(),x.lines.begin()+x.row[i],x.lines.begin()+x.row[i+1]);
-			_row.push_back(lines.size());
-			_ev_vec.insert(_ev_vec.end(),x.ev_vec.begin()+x.row[i],x.ev_vec.begin()+x.row[i+1]);
-			_y_vec.insert(_y_vec.end(),x.y_vec.begin()+x.row[i],x.y_vec.begin()+x.row[i+1]);
-			if (n_pixels)
-				_y_mat.insert(_y_mat.end(),x.y_mat.begin()+x.row[i]*n_pixels,x.y_mat.begin()+x.row[i+1]*n_pixels);
+			#pragma omp parallel sections
+			{
+				{
+					_Z_vec.push_back(Z);
+					_lines.insert(_lines.end(),x.lines.begin()+x.row[i],x.lines.begin()+x.row[i+1]);
+					_row.push_back(lines.size());
+				}
+				
+				#pragma omp section
+				{
+					_ev_vec.insert(_ev_vec.end(),x.ev_vec.begin()+x.row[i],x.ev_vec.begin()+x.row[i+1]);
+					_y_vec.insert(_y_vec.end(),x.y_vec.begin()+x.row[i],x.y_vec.begin()+x.row[i+1]);
+				}
+				
+				#pragma omp section
+				{
+					if (n_pixels)
+						_y_mat.insert(_y_mat.end(),x.y_mat.begin()+x.row[i]*n_pixels,x.y_mat.begin()+x.row[i+1]*n_pixels);
+				}
+			}
 		}
 	}
 }
@@ -224,17 +247,19 @@ Rayleigh::Rayleigh(const Sample & s, const Illumination & il, const solid_angle 
 {
 	_ev0 = il.ev0;
 	_omega = omega_;
+	// #pragma omp parallel for
 	for (std::vector<Monolayer>::const_iterator layer = s.layer_vec.begin(); layer < s.layer_vec.end(); layer++)
 	{
 		std::cout << "Calculating Rayleigh scattering for layer " << (*layer).layer << std::endl;
 		Rayleigh *temp_p = new Rayleigh(il.ev0, *layer, omega, false), & temp = *temp_p;
-		int i=0;
 		std::cout << "Calculating Rayleigh scattering attenuation for layer " << (*layer).layer << std::endl;
-		for (std::vector<double>::const_iterator theta = omega.theta.begin(); theta < omega.theta.end(); theta++)
+		#pragma omp parallel for collapse(2)
+		for (int theta = 0; theta < omega.theta.size(); theta++)
 		{
-			for (std::vector<double>::const_iterator beta = omega.beta.begin(); beta < omega.beta.end(); beta++)
+			for (int beta = 0; beta < omega.beta.size(); beta++)
 			{
-				double psiprime = il.psi_prime(*theta, *beta);
+				double psiprime = il.psi_prime(omega.theta[theta], omega.beta[beta]);
+				int i = theta*omega.beta.size() + beta;
 				//attenuation within the layer
 				temp._y_mat[i] *= atten_mono(il.ev0, il.ev0, il.psi, psiprime, *layer);
 				if (psiprime > 0) //reflection geometry
@@ -250,7 +275,6 @@ Rayleigh::Rayleigh(const Sample & s, const Illumination & il, const solid_angle 
 					for (std::vector<Monolayer>::const_iterator layer_down = layer+1; layer_down < s.layer_vec.end(); layer_down++)
 						temp._y_mat[i] *= atten_trans_out(il.ev0, psiprime, *layer_down);
 				}
-				i++;
 			}
 		}
 		add(temp, true);
@@ -278,6 +302,7 @@ void Rayleigh::add(const Rayleigh & x, bool mat_only)
 		if (y_mat.empty())
 			_y_mat = x.y_mat;
 		else
+			#pragma omp parallel for
 			for (int i = 0; i < y_mat.size(); i++)
 				_y_mat[i] = x.y_mat[i];
 	}
@@ -317,6 +342,7 @@ Compton::Compton(double ev0_, const Compound & c, const solid_angle & omega_, bo
 	_ev0 = ev0_;
 	_omega = omega_;
 	double theta, beta;
+	// #pragma omp parallel for
 	for (int j = 0; j < omega.theta.size(); j++)
 	{
 		theta = omega.theta[j];
@@ -329,6 +355,7 @@ Compton::Compton(double ev0_, const Compound & c, const solid_angle & omega_, bo
 				_y_vec.push_back(0);
 			continue;
 		}
+		// #pragma omp parallel for
 		for (int k = 0; k < omega.beta.size(); k++)
 		{
 			beta = omega.beta[k];
@@ -347,23 +374,26 @@ Compton::Compton(const Sample & s, const Illumination & il, const solid_angle & 
 	_ev0 = il.ev0;
 	_omega = omega_;
 	ev();
+	// #pragma omp parallel for
 	for (std::vector<Monolayer>::const_iterator layer = s.layer_vec.begin(); layer < s.layer_vec.end(); layer++)
 	{
 		std::cout << "Calculating Compton scattering for layer " << (*layer).layer << std::endl;
 		Compton *temp_p = new Compton(il.ev0, *layer, omega, false, false), & temp = *temp_p;
 		std::cout << "Calculating Compton scattering attenuation for layer " << (*layer).layer << std::endl;
-		int i = 0;
-		for (std::vector<double>::const_iterator theta = omega.theta.begin(), ev = ev_vec.begin(); theta < omega.theta.end(); theta++, ev++)
+		#pragma omp parallel for collapse(2)
+		// for (std::vector<double>::const_iterator theta = omega.theta.begin(), ev = ev_vec.begin(); theta < omega.theta.end(); theta++, ev++)
+		for (int theta = 0; theta < omega.theta.size(); theta++)
 		{
-			for (std::vector<double>::const_iterator beta = omega.beta.begin(); beta < omega.beta.end(); beta++)
+			for (int beta = 0; beta < omega.beta.size(); beta++)
 			{
-				double psiprime = il.psi_prime(*theta, *beta);
+				double psiprime = il.psi_prime(omega.theta[theta], omega.beta[beta]);
+				int i = theta*omega.beta.size() + beta;
 				//attenuation within the layer
-				temp._y_mat[i] *= atten_mono(il.ev0, *ev, il.psi, psiprime, *layer);
+				temp._y_mat[i] *= atten_mono(il.ev0, ev_vec[theta], il.psi, psiprime, *layer);
 				if (psiprime > 0) //reflection geometry
 					//attenuation from layers upstream
 					for (std::vector<Monolayer>::const_iterator layer_up = s.layer_vec.begin(); layer_up < layer; layer_up++)
-						temp._y_mat[i] *= atten_refl(il.ev0, *ev, il.psi, psiprime, *layer_up);
+						temp._y_mat[i] *= atten_refl(il.ev0, ev_vec[theta], il.psi, psiprime, *layer_up);
 				else if (psiprime < 0) //transmission geometry
 				{
 					//attenuation from layers upstream
@@ -371,9 +401,8 @@ Compton::Compton(const Sample & s, const Illumination & il, const solid_angle & 
 						temp._y_mat[i] *= atten_trans_in(il.ev0, il.psi, *layer_up);
 					//attenuation from layers downstream
 					for (std::vector<Monolayer>::const_iterator layer_down = layer+1; layer_down < s.layer_vec.end(); layer_down++)
-						temp._y_mat[i] *= atten_trans_out(*ev, psiprime, *layer_down);
+						temp._y_mat[i] *= atten_trans_out(ev_vec[theta], psiprime, *layer_down);
 				}
-				i++;
 			}
 		}
 		add(temp, true);
@@ -403,10 +432,12 @@ void Compton::add(const Compton & x, bool mat_only)
 		if (y_mat.empty())
 			_y_mat = x.y_mat;
 		else
+			#pragma omp parallel for
 			for (int i = 0; i < y_mat.size(); i++)
 				_y_mat[i] += x.y_mat[i];
 	}
 	if (!mat_only)
+		#pragma omp parallel for
 		for (int j = 0; j < x.y_vec.size(); j++)
 			_y_vec[j] += x.y_vec[j];
 }
@@ -415,9 +446,10 @@ void Compton::sum()
 {
 	if (!y_mat.empty())
 	{
-		_y_vec.clear();
+		_y_vec.resize(omega.theta.size());
+		#pragma omp parallel for
 		for (int j = 0; j < omega.theta.size(); j++)
-			_y_vec.push_back(std::accumulate(y_mat.begin()+j*omega.beta.size(),y_mat.begin()+(j+1)*omega.beta.size(),0.0));
+			_y_vec[j] = std::accumulate(y_mat.begin()+j*omega.beta.size(),y_mat.begin()+(j+1)*omega.beta.size(),0.0);
 	}
 }
 
@@ -425,26 +457,28 @@ void Compton::sum_ev()
 {
 	if (!y_mat.empty())
 	{
-		_y_vec.clear();
-		_ev_vec.clear();
+		_y_vec.resize(omega.theta.size());
+		_ev_vec.resize(omega.theta.size());
 		double theta;
+		#pragma omp parallel for private(theta)
 		for (int j = 0; j < omega.theta.size(); j++)
 		{
 			theta = omega.theta[j];
-			_y_vec.push_back(std::accumulate(y_mat.begin()+j*omega.beta.size(),y_mat.begin()+(j+1)*omega.beta.size(),0.0));
-			_ev_vec.push_back(ev_scattered(theta, ev0));
+			_y_vec[j] = std::accumulate(y_mat.begin()+j*omega.beta.size(),y_mat.begin()+(j+1)*omega.beta.size(),0.0);
+			_ev_vec[j] = ev_scattered(theta, ev0);
 		}
 	}
 }
 
 void Compton::ev()
 {
-	_ev_vec.clear();
+	_ev_vec.resize(omega.theta.size());
 	double theta;
+	#pragma omp parallel for private(theta)
 	for (int j = 0; j < omega.theta.size(); j++)
 	{
 		theta = omega.theta[j];
-		_ev_vec.push_back(ev_scattered(theta, ev0));
+		_ev_vec[j] = ev_scattered(theta, ev0);
 	}
 }
 
@@ -474,9 +508,13 @@ Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle 
 	_sample = s;
 	_detector = det;
 	
-	_xrf = Xrf(sample, illumination, omega);
-	_ray = Rayleigh(sample, illumination, omega);
-	_comp = Compton(sample, illumination, omega);
+		_xrf = Xrf(sample, illumination, omega);
+	#pragma omp parallel sections
+	{
+		{_ray = Rayleigh(sample, illumination, omega);}
+		#pragma omp section
+		{_comp = Compton(sample, illumination, omega);}
+	}
 	
 	_y_vec.clear();
 	_y_vec.resize(detector.channel.n_channels);
@@ -501,9 +539,14 @@ Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, c
 	_omega = omega_;
 	_detector = det;
 	
-	_xrf = Xrf(ev0, c, omega);
-	_ray = Rayleigh(ev0, c, omega);
-	_comp = Compton(ev0, c, omega);
+	#pragma omp parallel sections
+	{
+		{_xrf = Xrf(sample, illumination, omega);}
+		#pragma omp section
+		{_ray = Rayleigh(sample, illumination, omega);}
+		#pragma omp section
+		{_comp = Compton(sample, illumination, omega);}
+	}
 	
 	_y_vec.clear();
 	_y_vec.resize(detector.channel.n_channels);

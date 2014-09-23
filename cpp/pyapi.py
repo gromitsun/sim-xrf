@@ -52,6 +52,10 @@ def sim(input_file,
 		il,
 		sa,
 		nout):
+		
+	if not os.path.isfile(input_file):
+		raise IOError("File %s does not exit!" % input_file)
+	
 	lib.sim(ctypes.c_char_p(input_file), 
 		ctypes.c_char_p(output_file), 
 		y_vec.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
@@ -72,11 +76,9 @@ def sim(input_file,
 		nout.ctypes.data_as(ctypes.POINTER(ctypes.c_int)))
 
 
-def get_data(input_file = "input.txt",	
+def calc(input_file = "input.txt",	
 	output_file = "output.txt", 
 	nout = [2100, 30, 100, 100]):
-	input_file = "input.txt" 
-	output_file = "output.txt"
 	y_vec = np.zeros(nout[0])
 	y_sep = np.zeros(nout[0]*(nout[1]+2))
 	Z_vec = np.zeros(nout[1], dtype = int)
@@ -128,7 +130,7 @@ def get_data(input_file = "input.txt",
 	labels.append('Rayleigh')
 	labels.append('Compton')
 	
-	return Spectrum(y_vec[:n_channels], y_sep[:n_channels*(nout[1]+2)].reshape(n_channels, -1), labels, xrf, ray, comp, _det, _il, omega)
+	return Spectrum(y_vec[:n_channels], y_sep[:n_channels*(nout[1]+2)].reshape(-1, n_channels), labels, xrf, ray, comp, _det, _il, omega)
 	
 
 	# print y_vec
@@ -147,7 +149,8 @@ def get_data(input_file = "input.txt",
 	# print sa
 	# print nout
 	
-# spec = get_data()
+# spec = calc()
 
 # print spec.detector.window.material
 # print spec.labels
+# print spec.y_sep[0]

@@ -3,6 +3,8 @@
 #include <vector>
 #include "xraylib.h"
 
+#define mp 1 // OpenMP
+
 using namespace std;
 
 #define K_LINES -29
@@ -34,6 +36,7 @@ vector<int> mac_xrf(double ev0, int Z, vector<double> & ev_vec, vector<double> &
 		return lines;
 	}
 	
+	#pragma omp parallel for ordered if(mp)
 	for (int line = line_start; line >= line_end; line--)
 	{
 		double ev = LineEnergy(Z, line)*1e3;
@@ -42,9 +45,12 @@ vector<int> mac_xrf(double ev0, int Z, vector<double> & ev_vec, vector<double> &
 			double y = CS_FluorLine_Kissel_Cascade(Z, line, ev0/1e3);
 			if (y > 1e-50)
 			{
-				ev_vec.push_back(ev);
-				y_vec.push_back(y*weight);
-				lines.push_back(line);
+				#pragma omp ordered
+				{
+					ev_vec.push_back(ev);
+					y_vec.push_back(y*weight);
+					lines.push_back(line);
+				}
 			}
 		}
 	}

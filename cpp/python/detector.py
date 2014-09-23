@@ -10,7 +10,7 @@ class Channel(object):
 		self.ev_offset = ev_offset
 		self.ev_gain = ev_gain
 		self.n_channels = n_channels
-		self.ev_arr = np.arange(ev_offset, ev_offset+ev_gain*(n_channels+1), ev_gain)
+		self.ev_arr = np.arange(ev_offset, ev_offset+ev_gain*(n_channels), ev_gain)
 	def channel(self, ev):
 		return energy_to_channel(ev, self.ev_offset, self.ev_gain)
 

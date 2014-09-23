@@ -71,7 +71,7 @@ void sim(char * input_file,
 	readfile(input_file, sp, il, omega, det);
 	
 	// Calculate spectrum
-	Spectrum spec(sp, il, omega, det);
+	Spectrum spec(sp, il, omega, det, true, true, true);
 	
 	// Save results to file
 	std::ofstream fout;

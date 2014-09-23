@@ -19,6 +19,7 @@ int main(int argc, char ** argv)
 	Detector det;
 	
 	// Read input file
+	std::cout << "Reading file \"" << input_file << "\"..." << std::endl;
 	readfile(input_file, sp, il, omega, det);
 	
 	// Show configurations
@@ -26,16 +27,19 @@ int main(int argc, char ** argv)
 	omega.show();
 	
 	// Calculate spectrum
+	std::cout << "Calculating spectrum..." << std::endl;
 	Spectrum spec(sp, il, omega, det, true, true, true);
 	
 	// Show results on screen
 	spec.show();
 	
 	// Save results to file
+	std::cout << "Writing output into \"" << output_file << "\"..." << std::endl;
 	std::ofstream fout;
 	fout.open(output_file);
 	
 	spec.out(fout);
+	std::cout << "Done!" << std::endl;
 	
 	return 1;
 }
