@@ -6,7 +6,8 @@
 #include "input.hpp"
 extern "C"
 {
-	__declspec(dllexport) void sim(char * input_file, 
+	// __declspec(dllexport) 
+	void sim(char * input_file, 
 	char * output_file, 
 	// Total
 	double * y_vec,

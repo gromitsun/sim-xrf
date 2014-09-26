@@ -30,7 +30,7 @@ double thomson_unpol(double theta_rad)
 
 double dcs_rayleigh_pol(double theta_rad, double beta_rad, double ev, int Z)
 {
-	return sq(FF_Rayl(Z, 1e-8*theta2x(theta_rad, ev/1.e3)))*thomson_pol(theta_rad, beta_rad);
+	return sq(FF_Rayl(Z, 1e-8*theta2x(theta_rad, ev)))*thomson_pol(theta_rad, beta_rad);
 }
 	
 	
@@ -53,14 +53,14 @@ double ev_scattered(double theta_rad, double ev) //return the energy in ev of th
 double klein_nishina_unpol(double theta_rad, double ev) //Differential Klein-Nishina cross section in cm^2 for unpolarized radiation.
 
 {
-	double ev1 = ev_scattered(ev, theta_rad);
+	double ev1 = ev_scattered(theta_rad, ev);
 	return sq(r_e*(ev1/ev))/2.*(ev1/ev+ev/ev1-sq(sin(theta_rad)));
 }
 
 double klein_nishina_pol(double theta_rad, double beta_rad, double ev) //Differential Klein-Nishina cross section in cm^2 for polarized radiation.
 
 {
-	double ev1 = ev_scattered(ev, theta_rad);
+	double ev1 = ev_scattered(theta_rad, ev);
 	return sq(r_e*(ev1/ev))/2.*(ev1/ev+ev/ev1-2*sq(sin(theta_rad)*cos(beta_rad)));
 }
 

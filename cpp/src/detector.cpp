@@ -7,6 +7,8 @@
 #include "math.hpp"
 #include "constants.hpp"
 
+#define MP 1
+
 Channel::Channel(double ev_offset_, double ev_gain_, int n_channels_) 
 	: ev_offset(_ev_offset), ev_gain(_ev_gain), n_channels(_n_channels)
 {
@@ -38,6 +40,7 @@ void Channel::bin(const std::vector<double> & ev_raw, const std::vector<double> 
 		std::cout << "Error: Bin size does not match the number of channels!" << std::endl;
 		return;
 	}
+	#pragma omp parallel for if(MP)
 	for (int i=0; i<ev_raw.size(); i++)
 		y_binned[ev_to_channel(ev_raw[i])] += y_raw[i];
 }
@@ -61,17 +64,15 @@ void Channel::bin(const std::vector<double> & ev_raw, const std::vector<double> 
 	}
 	int n_old = y_separate.size();
 	y_separate.resize(n_old+n_channels);
-	int i = 0, chn;
-	for (std::vector<double>::const_iterator ev = ev_raw.begin(), y = y_raw.begin();
-		ev < ev_raw.end(); ev++, y++)
-	{
-		chn = ev_to_channel(*ev);
-		y_binned[chn] += *y;
-		// for separate output
-		if (ev - ev_raw.begin() == row[i+1])
-			i++;
-		y_separate[n_old + i*n_channels + chn] = *y;
-	}
+	#pragma omp parallel for collapse(2) if(MP)
+	for (int i = 0; i < row.size()-1; i++)
+		for (int j = row[i]; j < ((row[i+1] > 0) ? row[i+1] : ev_raw.size()); j++)
+		{
+			int chn = ev_to_channel(ev_raw[j]);
+			y_binned[chn] += y_raw[j];
+			// for separate output
+			y_separate[n_old + i*n_channels + chn] = y_raw[j];
+		}
 }
 
 void Channel::bin(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate) const
@@ -190,25 +191,25 @@ void Detector::genspec(const std::vector<double> & ev_raw, const std::vector<dou
 	if (det_response)
 	{
 		std::cout << "Generating spectrum with detector response..." << std::endl;
-		double sigma, ev_ch, y_temp;
+		double sigma, y_temp;
 		for (std::vector<double>::const_iterator ev = ev_raw.begin(), y = y_raw.begin();
 			ev < ev_raw.end(); ev++, y++)
 		{
 			sigma = std::sqrt(sq(response.noise/2.3548)+3.58*response.fano*(*ev));
-			ev_ch = channel.ev_offset;
 			y_temp = *y;
 			//apply detector filter window
 			if (det_window)
 				y_temp *= window.transmission(*ev);
-			for (std::vector<double>::iterator yb = y_binned.begin(); yb < y_binned.end(); yb++)
+			#pragma omp parallel for if(MP)
+			for (int i = 0; i < y_binned.size(); i++)
 			{
+				double ev_ch = channel.ev_offset + i*channel.ev_gain;
 				//Gaussian
-				*yb += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq((*ev)-ev_ch)/(2*sq(sigma)));
+				y_binned[i] += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq((*ev)-ev_ch)/(2*sq(sigma)));
 				//Step function
-				*yb += response.fs*y_temp*channel.ev_gain/(2.*(*ev))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma));
+				y_binned[i] += response.fs*y_temp*channel.ev_gain/(2.*(*ev))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma));
 				//Tailing function
-				*yb += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-(*ev))/(response.gamma*sigma))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
-				ev_ch += channel.ev_gain;
+				y_binned[i] += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-(*ev))/(response.gamma*sigma))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
 			}
 		}
 	}
@@ -216,9 +217,9 @@ void Detector::genspec(const std::vector<double> & ev_raw, const std::vector<dou
 	{
 		std::cout << "Generating spectrum without detector response..." << std::endl;
 		if (det_window)//apply detector filter window
-			for (std::vector<double>::const_iterator ev = ev_raw.begin(), y = y_raw.begin();
-				ev < ev_raw.end(); ev++, y++)
-				y_binned[channel.ev_to_channel(*ev)] += (*y)*window.transmission(*ev);
+			#pragma omp parallel for if(MP)
+			for (int i = 0;	i < ev_raw.size(); i++)
+				y_binned[channel.ev_to_channel(ev_raw[i])] += (y_raw[i])*window.transmission(ev_raw[i]);
 		else
 			channel.bin(ev_raw, y_raw, y_binned);
 	}
@@ -235,22 +236,21 @@ void Detector::genspec(const double & ev_raw, const double & y_raw, std::vector<
 	if (det_response)
 	{
 		std::cout << "Generating spectrum with detector response..." << std::endl;
-		double sigma, ev_ch, y_temp;
+		double sigma, y_temp;
 		sigma = std::sqrt(sq(response.noise/2.3548)+3.58*response.fano*ev_raw);
-		ev_ch = channel.ev_offset;
 		y_temp = y_raw;
 		//apply detector filter window
 		if (det_window)
 			y_temp *= window.transmission(ev_raw);
-		for (std::vector<double>::iterator yb = y_binned.begin(); yb < y_binned.end(); yb++)
+		for (int i = 0; i < y_binned.size(); i++)
 		{
+			double ev_ch = channel.ev_offset + i*channel.ev_gain;
 			//Gaussian
-			*yb += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq(ev_raw-ev_ch)/(2*sq(sigma)));
+			y_binned[i] += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq(ev_raw-ev_ch)/(2*sq(sigma)));
 			//Step function
-			*yb += response.fs*y_temp*channel.ev_gain/(2.*ev_raw)*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma));
+			y_binned[i] += response.fs*y_temp*channel.ev_gain/(2.*ev_raw)*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma));
 			//Tailing function
-			*yb += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-ev_raw)/(response.gamma*sigma))*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
-			ev_ch += channel.ev_gain;
+			y_binned[i] += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-ev_raw)/(response.gamma*sigma))*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
 		}
 	}
 	else
@@ -281,7 +281,7 @@ void Detector::genspec(const std::vector<double> & ev_raw, const std::vector<dou
 		ys0 = y_separate.begin() + n_old;
 
 		int i = 0;
-		double sigma, ev_ch, y_temp;
+		double sigma, y_temp;
 		for (std::vector<double>::const_iterator ev = ev_raw.begin(), y = y_raw.begin();
 			ev < ev_raw.end(); ev++, y++)
 		{
@@ -290,27 +290,27 @@ void Detector::genspec(const std::vector<double> & ev_raw, const std::vector<dou
 				i++;
 			
 			sigma = std::sqrt(sq(response.noise/2.3548)+3.58*response.fano*(*ev));
-			ev_ch = channel.ev_offset;
 			y_temp = *y;
 			//apply detector filter window
 			if (det_window)
 				y_temp *= window.transmission(*ev);
-			for (std::vector<double>::iterator yb = y_binned.begin(), ys1 = ys0 + i*channel.n_channels;
-					yb < y_binned.end(); yb++, ys1++)
+			#pragma omp parallel for if(MP)
+			for (int j = 0; j < y_binned.size(); j++)
 			{
 				double y_temp1 = 0;
+				double ev_ch = channel.ev_offset + j*channel.ev_gain;
+				
 				//Gaussian
 				y_temp1 += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq((*ev)-ev_ch)/(2*sq(sigma)));
 				//Step function
 				y_temp1 += response.fs*y_temp*channel.ev_gain/(2.*(*ev))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma));
 				//Tailing function
 				y_temp1 += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-(*ev))/(response.gamma*sigma))*std::erfc((ev_ch-(*ev))/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
-				ev_ch += channel.ev_gain;
 				
 				// Total output
-				*yb += y_temp1;
+				y_binned[j] += y_temp1;
 				//Separate output
-				*ys1 += y_temp1;
+				*(ys0 + i*channel.n_channels + j) += y_temp1;
 			}
 		}
 	}
@@ -324,19 +324,16 @@ void Detector::genspec(const std::vector<double> & ev_raw, const std::vector<dou
 		int i = 0;
 		if (det_window)//apply detector filter window
 		{
-			int chn;
-			double y_temp;
-			for (std::vector<double>::const_iterator ev = ev_raw.begin(), y = y_raw.begin();
-				ev < ev_raw.end(); ev++, y++)
-			{
-				chn = channel.ev_to_channel(*ev);
-				y_temp = (*y)*window.transmission(*ev);
-				y_binned[chn] += y_temp;
-				// for separate output
-				if (ev - ev_raw.begin() == row[i+1])
-					i++;
-				*(ys0 + i*channel.n_channels + chn) = y_temp;
-			}
+			#pragma omp parallel for collapse(2) if(MP)
+			for (int i = 0; i < row.size()-1; i++)
+				for (int j = row[i]; j < ((row[i+1] > 0) ? row[i+1] : ev_raw.size()); j++)
+				{
+					int chn = channel.ev_to_channel(ev_raw[j]);
+					double y_temp = (y_raw[j])*window.transmission(ev_raw[j]);
+					y_binned[chn] += y_temp;
+					// for separate output
+					*(ys0 + i*channel.n_channels + chn) = y_temp;
+				}
 		}
 		else
 			channel.bin(ev_raw, y_raw, y_binned, y_separate, row);
@@ -358,28 +355,28 @@ void Detector::genspec(const double & ev_raw, const double & y_raw, std::vector<
 		int n_old = y_separate.size();
 		y_separate.resize(n_old+channel.n_channels);
 		ys0 = y_separate.begin() + n_old;
-		double sigma, ev_ch, y_temp;
+		double sigma, y_temp;
 		sigma = std::sqrt(sq(response.noise/2.3548)+3.58*response.fano*ev_raw);
-		ev_ch = channel.ev_offset;
 		y_temp = y_raw;
 		//apply detector filter window
 		if (det_window)
 			y_temp *= window.transmission(ev_raw);
-		for (std::vector<double>::iterator yb = y_binned.begin(); yb < y_binned.end(); yb++, ys0++)
+		#pragma omp parallel for if(MP)
+		for (int i = 0; i < y_binned.size(); i++)
 		{
 			double y_temp1 = 0;
+			double ev_ch = channel.ev_offset + i*channel.ev_gain;
 			//Gaussian
 			y_temp1 += y_temp*channel.ev_gain/(sigma*std::sqrt(2*Pi))*std::exp(-sq(ev_raw-ev_ch)/(2*sq(sigma)));
 			//Step function
 			y_temp1 += response.fs*y_temp*channel.ev_gain/(2.*ev_raw)*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma));
 			//Tailing function
 			y_temp1 += response.ft*y_temp*channel.ev_gain/(2.*response.gamma*sigma*std::exp(-1./(2*sq(response.gamma))))*std::exp((ev_ch-ev_raw)/(response.gamma*sigma))*std::erfc((ev_ch-ev_raw)/(std::sqrt(2)*sigma)+1/(std::sqrt(2)*response.gamma));
-			ev_ch += channel.ev_gain;
 			
 			// Total output
-			*yb += y_temp1;
+			y_binned[i] += y_temp1;
 			//Separate output
-			*ys0 = y_temp1;
+			*(ys0+i) = y_temp1;
 		}
 	}
 	else

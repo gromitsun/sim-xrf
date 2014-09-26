@@ -92,6 +92,7 @@ Monolayer::Monolayer() : Compound::Compound(), density(_density), thickness(_thi
 
 }
 
+// Copy constructor: used when passing through function calls
 Monolayer::Monolayer(const Monolayer & ml) : Compound::Compound(), density(_density), thickness(_thickness), layer(_layer)
 {
 	operator=(ml);
@@ -109,6 +110,7 @@ Monolayer::~Monolayer()
 	
 }
 
+// overloaded assignment operator
 Monolayer & Monolayer::operator=(const Monolayer & ml)
 {
 	if (this == &ml)

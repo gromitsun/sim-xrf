@@ -138,7 +138,7 @@ solid_angle & solid_angle::operator=(const solid_angle & sa)
 	return *this;
 }
 
-double solid_angle::domega(const double & theta, const double & beta) const
+double solid_angle::domega(const double & theta) const
 {
 	return std::sin(theta)*_theta_inc*_beta_inc;
 }

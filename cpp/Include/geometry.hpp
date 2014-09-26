@@ -53,7 +53,7 @@ public:
 	const double & theta_inc;
 	const double & beta_inc;
 	const double & subtend;
-	double domega(const double & theta, const double & beta) const;
+	double domega(const double & theta) const;
 	void show() const;
 	void out(std::ostream & ost) const;
 };

@@ -14,14 +14,14 @@ else
     #Linux stuff
     # RM = rm
 	DLIB = so
-	exe = out
+	EXE = out
 endif
 
 g++ = g++
 
 all: main.o
 	$(MAKE) -C ./src all
-	$(g++) main.o -L./Lib -lsim -L$(XRL_PATH)/Lib -lxrl -o main.$(EXE) -fopenmp
+	$(g++) main.o -L./Lib -lsim -L$(XRL_PATH)/Lib -lxrl -o main.$(EXE) -fopenmp #-static
 	
 
 main.o:

@@ -3,7 +3,7 @@
 #include <vector>
 #include "xraylib.h"
 
-#define mp 1 // OpenMP
+#define MP 1 // OpenMP
 
 using namespace std;
 
@@ -36,7 +36,7 @@ vector<int> mac_xrf(double ev0, int Z, vector<double> & ev_vec, vector<double> &
 		return lines;
 	}
 	
-	#pragma omp parallel for ordered if(mp)
+	#pragma omp parallel for ordered if(MP)
 	for (int line = line_start; line >= line_end; line--)
 	{
 		double ev = LineEnergy(Z, line)*1e3;
