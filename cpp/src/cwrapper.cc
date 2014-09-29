@@ -83,49 +83,81 @@ void sim(char * input_file,
 	// Return results
 	
 	// Total
-	for (auto i : spec.y_vec)
-		*(y_vec++) = i;
-	// *y_vec = -1;
+	if (spec.y_vec.size() > *nout)
+		std::cerr << "Error: Output for y_vec out of range! ("
+		<< *nout << " given, needs "
+		<< spec.y_vec.size() << ".)" << std::endl;
+	else
+		for (auto i : spec.y_vec)
+			*(y_vec++) = i;
+		// *y_vec = -1;
 	*(nout++) = spec.y_vec.size();
 	
 	// Separate
-	for (auto i : spec.y_sep)
-		*(y_sep++) = i;
-	// *y_sep = -1;
+	if (spec.y_sep.size() > ((*nout)+2)*(*(nout-1)))
+		std::cerr << "Error: Output for y_sep out of range! ("
+		<< ((*nout)+2)*(*(nout-1)) << " given, needs "
+		<< spec.y_sep.size() << ".)" << std::endl;
+	else
+		for (auto i : spec.y_sep)
+			*(y_sep++) = i;
+		// *y_sep = -1;
 	
 	
 	// XRF
-	for (auto i : spec.xrf.Z_vec)
-		*(Z_vec++) = i;
-	// *Z_vec = -1;
+	if (spec.xrf.Z_vec.size() > *nout)
+		std::cerr << "Error: Output for xrf.Z_vec out of range! ("
+		<< *nout << " given, needs "
+		<< spec.xrf.Z_vec.size() << ".)" << std::endl;
+	else
+	{
+		for (auto i : spec.xrf.Z_vec)
+			*(Z_vec++) = i;
+		// *Z_vec = -1;
+	
+		for (auto i : spec.xrf.row)
+			*(row++) = i;
+		// *row = -1;
+	}
 	*(nout++) = spec.xrf.Z_vec.size();
 	
-	for (auto i : spec.xrf.row)
-		*(row++) = i;
-	*row = -1;
+	if (spec.xrf.lines.size() > *nout)
+		std::cerr << "Error: Output for xrf.lines out of range! ("
+		<< *nout << " given, needs "
+		<< spec.xrf.lines.size() << ".)" << std::endl;
+	else
+	{
+		for (auto i : spec.xrf.lines)
+			*(lines++) = i;
+		// *lines = -1;
 	
-	for (auto i : spec.xrf.lines)
-		*(lines++) = i;
-	// *lines = -1;
+		for (auto i : spec.xrf.ev_vec)
+			*(xrf_ev++) = i;
+		// *xrf_ev = -1;
+		
+		for (auto i : spec.xrf.y_vec)
+			*(xrf_y++) = i;
+		// *xrf_y = -1;
+	}
 	*(nout++) = spec.xrf.lines.size();
 	
-	for (auto i : spec.xrf.ev_vec)
-		*(xrf_ev++) = i;
-	// *xrf_ev = -1;
-	
-	for (auto i : spec.xrf.y_vec)
-		*(xrf_y++) = i;
-	// *xrf_y = -1;
-
 	// Compton
-	for (auto i : spec.comp.ev_vec)
-		*(comp_ev++) = i;
-	// *comp_ev = -1;
+	if (spec.comp.ev_vec.size() > *nout)
+		std::cerr << "Error: Output for comp.ev_vec out of range! ("
+		<< *nout << " given, needs "
+		<< spec.comp.ev_vec.size() << ".)" << std::endl;
+	else
+	{
+		for (auto i : spec.comp.ev_vec)
+			*(comp_ev++) = i;
+		// *comp_ev = -1;
+		
+		for (auto i : spec.comp.y_vec)
+			*(comp_y++) = i;
+		// *comp_y = -1;
+	}
 	*(nout++) = spec.comp.ev_vec.size();
 	
-	for (auto i : spec.comp.y_vec)
-		*(comp_y++) = i;
-	// *comp_y = -1;
 
 	// Rayleigh
 	*ray_y = spec.ray.y;

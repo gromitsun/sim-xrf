@@ -78,7 +78,7 @@ def sim(input_file,
 
 def calc(input_file = "input.txt",	
 	output_file = "output.txt", 
-	nout = [5000, 30, 500, 500]): # N of channels, N of Z, N of lines, N of thetas
+	nout = [1000, 30, 500, 500]): # N of channels, N of Z, N of lines, N of thetas
 	y_vec = np.zeros(nout[0])
 	y_sep = np.zeros(nout[0]*(nout[1]+2))
 	Z_vec = np.zeros(nout[1], dtype = int)
@@ -94,7 +94,7 @@ def calc(input_file = "input.txt",
 	win_mat = np.zeros(20, dtype = int)
 	il = np.zeros(3)
 	sa = np.zeros(6)
-	nout = np.zeros(4, dtype = int)
+	nout = np.array(nout, dtype = int)
 		
 	sim(input_file, 
 			output_file,
@@ -127,8 +127,8 @@ def calc(input_file = "input.txt",
 	
 	# labels = Z_vec[:nout[1]].tolist()
 	labels = [number2symbol(Z) for Z in Z_vec[:nout[1]]]
-	labels.append('Compton')
 	labels.append('Rayleigh')
+	labels.append('Compton')
 	
 	return Spectrum(y_vec[:n_channels], y_sep[:n_channels*(nout[1]+2)].reshape(-1, n_channels), labels, xrf, ray, comp, _det, _il, omega)
 	

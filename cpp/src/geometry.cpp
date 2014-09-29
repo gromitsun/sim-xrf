@@ -230,9 +230,9 @@ double atten_mono(const double & ev0,
 	if (mac0+mac1*sp0/sp1 < 1e-50 && mac0+mac1*sp0/sp1 > -1e-50) // To avoid division by zero
 		return 0;
 	if (psiprime > 0)
-		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/((mac0+mac1*sp0/sp1)*rho);
+		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/(mac0+mac1*sp0/sp1);
 	else
-		return (std::exp(mac1*rho*t/sp1)-std::exp(-mac0*rho*t/sp0))/((mac0+mac1*sp0/sp1)*rho);
+		return (std::exp(mac1*rho*t/sp1)-std::exp(-mac0*rho*t/sp0))/(mac0+mac1*sp0/sp1);
 }
 
 double atten_refl(const double & ev0, 

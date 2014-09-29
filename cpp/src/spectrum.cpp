@@ -261,7 +261,7 @@ Rayleigh::Rayleigh(const Sample & s, const Illumination & il, const solid_angle 
 				{
 					//attenuation from layers upstream
 					for (std::vector<Monolayer>::const_iterator layer_up = s.layer_vec.begin(); layer_up < layer; layer_up++)
-						temp._y_mat[i]*= atten_trans_in(il.ev0, il.psi, *layer_up);
+						temp._y_mat[i] *= atten_trans_in(il.ev0, il.psi, *layer_up);
 					//attenuation from layers downstream
 					for (std::vector<Monolayer>::const_iterator layer_down = layer+1; layer_down < s.layer_vec.end(); layer_down++)
 						temp._y_mat[i] *= atten_trans_out(il.ev0, psiprime, *layer_down);
@@ -295,7 +295,7 @@ void Rayleigh::add(const Rayleigh & x, bool mat_only)
 		else
 			#pragma omp parallel for if(MP)
 			for (int i = 0; i < y_mat.size(); i++)
-				_y_mat[i] = x.y_mat[i];
+				_y_mat[i] += x.y_mat[i];
 	}
 	if (!mat_only)
 		_y += x.y;
@@ -525,15 +525,15 @@ Spectrum::Spectrum(const Sample & s, const Illumination & il, const solid_angle 
 	if (!separate)
 	{
 		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
-		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
 		detector.genspec(illumination.ev0, ray.y, _y_vec);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
 	}
 	else
 	{
 		std::vector<int> row_temp{0, -1};
 		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec, _y_sep, xrf.row);
-		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
 		detector.genspec(illumination.ev0, ray.y, _y_vec, _y_sep);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
 	}
 }
 
@@ -557,15 +557,15 @@ Spectrum::Spectrum(double ev0, const Compound & c, const solid_angle & omega_, c
 	if (!separate)
 	{
 		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec);
-		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
 		detector.genspec(illumination.ev0, ray.y, _y_vec);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec);
 	}
 	else
 	{
 		std::vector<int> row_temp{0, -1};
 		detector.genspec(xrf.ev_vec, xrf.y_vec, _y_vec, _y_sep, xrf.row);
-		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
 		detector.genspec(illumination.ev0, ray.y, _y_vec, _y_sep);
+		detector.genspec(comp.ev_vec, comp.y_vec, _y_vec, _y_sep, row_temp);
 	}
 }
 

@@ -65,7 +65,7 @@ private:
 public:
 	Window(std::string material_ = "Be",
 	double thickness_ = 24e-4,
-	double density_ = 1);
+	double density_ = 1.848);
 	// ~Window();
 	Window & operator=(const Window & w);
 	const std::string & material;
