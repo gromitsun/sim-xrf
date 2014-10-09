@@ -95,6 +95,8 @@ def calc(input_file = "input.txt",
 	il = np.zeros(3)
 	sa = np.zeros(6)
 	nout = np.array(nout, dtype = int)
+	
+	_nout = nout.copy()
 		
 	sim(input_file, 
 			output_file,
@@ -114,6 +116,10 @@ def calc(input_file = "input.txt",
 			il,
 			sa,
 			nout)
+	
+	# check out-of-range errors
+	if (nout > _nout).any():
+		raise IOError("Output out of range! \nGiven: " + str(_nout) + "\nNeeds: " + str(nout))
 	
 	xrf = Xrf(None, xrf_y[:nout[2]], xrf_ev[:nout[2]], lines[:nout[2]], Z_vec[:nout[1]], row[:nout[1]+1])
 	comp = Compton(None, comp_y[:nout[3]], comp_ev[:nout[3]])
