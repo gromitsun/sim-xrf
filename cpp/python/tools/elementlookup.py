@@ -1,7 +1,6 @@
-import os
+from . import __path__ as datapath
 
-datapath = os.path.dirname(os.path.realpath('./'))
-
+datapath = datapath[0]
 
 def lookup(x):
     """

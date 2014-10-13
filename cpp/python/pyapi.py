@@ -13,7 +13,7 @@ try:
 except OSError:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.dll')
 
-from .classes.spectrum import Spectrum
+from .classes.spectrum import *
 
 
 lib.sim.restype = None
