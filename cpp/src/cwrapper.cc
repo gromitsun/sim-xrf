@@ -80,93 +80,90 @@ void sim(char * input_file,
 	spec.out(fout);
 	fout.close();
 
-	// Make a copy of nout
-	int nout_[4];
-	for (int i=0; i<4; i++)
-        nout_[i] = nout[i];
-
-	// Return results
+   	// Return results
 	
 	// Total
-	if (spec.y_vec.size() > nout_[0])
+	if (spec.y_vec.size() > nout[0])
 		std::cerr << "Error: Output for y_vec out of range! ("
-		<< *nout_ << " given, needs "
+		<< nout[0] << " given, needs "
 		<< spec.y_vec.size() << ".)" << std::endl;
 	else
 		for (auto i : spec.y_vec)
 			*(y_vec++) = i;
 		// *y_vec = -1;
-	*(nout++) = spec.y_vec.size();
-	
+
 	// Separate
-	if (spec.y_sep.size() > (nout_[1]+2)*nout_[0])
+	if (spec.y_sep.size() > (nout[1]+2)*nout[0])
 		std::cerr << "Error: Output for y_sep out of range! ("
-		<< (nout_[1]+2)*nout_[0] << " given, needs "
+		<< (nout[1]+2)*nout[0] << " given, needs "
 		<< spec.y_sep.size() << ".)" << std::endl;
 	else
 		for (auto i : spec.y_sep)
 			*(y_sep++) = i;
 		// *y_sep = -1;
-	
-	
+
+
 	// XRF
-	if (spec.xrf.Z_vec.size() > nout_[1])
+	if (spec.xrf.Z_vec.size() > nout[1])
 		std::cerr << "Error: Output for xrf.Z_vec out of range! ("
-		<< nout_[1] << " given, needs "
+		<< nout[1] << " given, needs "
 		<< spec.xrf.Z_vec.size() << ".)" << std::endl;
 	else
 	{
 		for (auto i : spec.xrf.Z_vec)
 			*(Z_vec++) = i;
 		// *Z_vec = -1;
-	
+
 		for (auto i : spec.xrf.row)
 			*(row++) = i;
 		// *row = -1;
 	}
-	*(nout++) = spec.xrf.Z_vec.size();
-	
-	if (spec.xrf.lines.size() > nout_[2])
+
+	if (spec.xrf.lines.size() > nout[2])
 		std::cerr << "Error: Output for xrf.lines out of range! ("
-		<< nout_[2] << " given, needs "
+		<< nout[2] << " given, needs "
 		<< spec.xrf.lines.size() << ".)" << std::endl;
 	else
 	{
 		for (auto i : spec.xrf.lines)
 			*(lines++) = i;
 		// *lines = -1;
-	
+
 		for (auto i : spec.xrf.ev_vec)
 			*(xrf_ev++) = i;
 		// *xrf_ev = -1;
-		
+
 		for (auto i : spec.xrf.y_vec)
 			*(xrf_y++) = i;
 		// *xrf_y = -1;
 	}
-	*(nout++) = spec.xrf.lines.size();
-	
+
 	// Compton
-	if (spec.comp.ev_vec.size() > nout_[3])
+	if (spec.comp.ev_vec.size() > nout[3])
 		std::cerr << "Error: Output for comp.ev_vec out of range! ("
-		<< nout_[3] << " given, needs "
+		<< nout[3] << " given, needs "
 		<< spec.comp.ev_vec.size() << ".)" << std::endl;
 	else
 	{
 		for (auto i : spec.comp.ev_vec)
 			*(comp_ev++) = i;
 		// *comp_ev = -1;
-		
+
 		for (auto i : spec.comp.y_vec)
 			*(comp_y++) = i;
 		// *comp_y = -1;
 	}
-	*(nout++) = spec.comp.ev_vec.size();
-	
+
+	// nout
+	nout[0] = spec.y_vec.size();
+	nout[1] = spec.xrf.Z_vec.size();
+	nout[2] = spec.xrf.lines.size();
+	nout[3] = spec.comp.ev_vec.size();
+
 
 	// Rayleigh
 	*ray_y = spec.ray.y;
-	
+
 	// Detector
 	*(det_++) = det.channel.ev_offset;
 	*(det_++) = det.channel.ev_gain;
@@ -181,17 +178,16 @@ void sim(char * input_file,
 	for (int i = 0; i < det.window.material.length(); i++)
 		*(win_mat++) = int(det.window.material.at(i));
 	*(win_mat) = int('\n');
-	
+
 	// Illumination
 	*(il_++) = il.ev0;
 	*(il_++) = il.psi;
 	*(il_) = il.alpha;
-	
+
 	// Solid angle
 	for (int i = 0; i < 4; i++)
 		*(sa++) = omega.angle_range[i];
 	*(sa++) = omega.theta_inc;
 	*(sa) = omega.beta_inc;
-	
 }
 

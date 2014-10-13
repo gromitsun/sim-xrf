@@ -1,7 +1,6 @@
 # pyapi.py
 # # # This file must be put in the same directory as main.cpp.
 import ctypes
-import numpy as np
 import os
 
 from tools.elementlookup import number2symbol  # Must be imported before loading the DLL.
@@ -83,20 +82,20 @@ def calc(input_file="input.txt",
          nout=[3000, 30, 500, 500]):  # N of channels, N of Z, N of lines, N of thetas
     y_vec = np.zeros(nout[0])
     y_sep = np.zeros(nout[0] * (nout[1] + 2))
-    Z_vec = np.zeros(nout[1], dtype=int)
-    row = np.zeros(nout[1] + 2, dtype=int)
-    lines = np.zeros(nout[2], dtype=int)
+    Z_vec = np.zeros(nout[1], dtype=np.dtype(ctypes.c_int))
+    row = np.zeros(nout[1] + 2, dtype=np.dtype(ctypes.c_int))
+    lines = np.zeros(nout[2], dtype=np.dtype(ctypes.c_int))
     xrf_ev = np.zeros(nout[2])
     xrf_y = np.zeros(nout[2])
     comp_ev = np.zeros(nout[3])
     comp_y = np.zeros(nout[3])
     ray_y = np.zeros(1)
     det = np.zeros(9)
-    n_channels = np.zeros(1, dtype=int)
-    win_mat = np.zeros(20, dtype=int)
+    n_channels = np.zeros(1, dtype=np.dtype(ctypes.c_int))
+    win_mat = np.zeros(20, dtype=np.dtype(ctypes.c_int))
     il = np.zeros(3)
     sa = np.zeros(6)
-    nout = np.array(nout, dtype=int)
+    nout = np.array(nout, dtype=np.dtype(ctypes.c_int))
 
     _nout = nout.copy()
 
