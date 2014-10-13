@@ -28,3 +28,7 @@
 cpp/.idea
 python/.idea
 >>>>>>> .merge_file_a05376
+
+# Compiled Python files
+*.pyc
+*.pyd
