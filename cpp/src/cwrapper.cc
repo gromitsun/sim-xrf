@@ -79,13 +79,18 @@ void sim(char * input_file,
 	fout.open(output_file);
 	spec.out(fout);
 	fout.close();
-	
+
+	// Make a copy of nout
+	int nout_[4];
+	for (int i=0; i<4; i++)
+        nout_[i] = nout[i];
+
 	// Return results
 	
 	// Total
-	if (spec.y_vec.size() > *nout)
+	if (spec.y_vec.size() > nout_[0])
 		std::cerr << "Error: Output for y_vec out of range! ("
-		<< *nout << " given, needs "
+		<< *nout_ << " given, needs "
 		<< spec.y_vec.size() << ".)" << std::endl;
 	else
 		for (auto i : spec.y_vec)
@@ -94,9 +99,9 @@ void sim(char * input_file,
 	*(nout++) = spec.y_vec.size();
 	
 	// Separate
-	if (spec.y_sep.size() > ((*nout)+2)*(*(nout-1)))
+	if (spec.y_sep.size() > (nout_[1]+2)*nout_[0])
 		std::cerr << "Error: Output for y_sep out of range! ("
-		<< ((*nout)+2)*(*(nout-1)) << " given, needs "
+		<< (nout_[1]+2)*nout_[0] << " given, needs "
 		<< spec.y_sep.size() << ".)" << std::endl;
 	else
 		for (auto i : spec.y_sep)
@@ -105,9 +110,9 @@ void sim(char * input_file,
 	
 	
 	// XRF
-	if (spec.xrf.Z_vec.size() > *nout)
+	if (spec.xrf.Z_vec.size() > nout_[1])
 		std::cerr << "Error: Output for xrf.Z_vec out of range! ("
-		<< *nout << " given, needs "
+		<< nout_[1] << " given, needs "
 		<< spec.xrf.Z_vec.size() << ".)" << std::endl;
 	else
 	{
@@ -121,9 +126,9 @@ void sim(char * input_file,
 	}
 	*(nout++) = spec.xrf.Z_vec.size();
 	
-	if (spec.xrf.lines.size() > *nout)
+	if (spec.xrf.lines.size() > nout_[2])
 		std::cerr << "Error: Output for xrf.lines out of range! ("
-		<< *nout << " given, needs "
+		<< nout_[2] << " given, needs "
 		<< spec.xrf.lines.size() << ".)" << std::endl;
 	else
 	{
@@ -142,9 +147,9 @@ void sim(char * input_file,
 	*(nout++) = spec.xrf.lines.size();
 	
 	// Compton
-	if (spec.comp.ev_vec.size() > *nout)
+	if (spec.comp.ev_vec.size() > nout_[3])
 		std::cerr << "Error: Output for comp.ev_vec out of range! ("
-		<< *nout << " given, needs "
+		<< nout_[3] << " given, needs "
 		<< spec.comp.ev_vec.size() << ".)" << std::endl;
 	else
 	{
