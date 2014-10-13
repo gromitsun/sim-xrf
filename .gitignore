@@ -21,5 +21,6 @@
 *.app
 
 # PyCharm files
-cpp/.idea/
 .idea/
+cpp/.idea
+python/.idea

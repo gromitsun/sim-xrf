@@ -53,7 +53,7 @@ class Spectrum():
 		comp = Compton(),
 		det = Detector(),
 		il = Illumination(),
-		omega = solid_angle()):
+		omega = SolidAngle()):
 		self.y_vec = y_vec
 		self.y_sep = y_sep
 		self.labels = labels

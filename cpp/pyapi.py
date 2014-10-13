@@ -129,7 +129,7 @@ def calc(input_file = "input.txt",
 					Response(*det[2:-2], ev_gain = det[1]),
 					Window(win_mat, *det[-2:]))
 	_il = Illumination(*il)
-	omega = solid_angle(sa[:4], *sa[-2:])
+	omega = SolidAngle(sa[:4], *sa[-2:])
 	
 	# labels = Z_vec[:nout[1]].tolist()
 	labels = [number2symbol(Z) for Z in Z_vec[:nout[1]]]
