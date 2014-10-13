@@ -19,4 +19,12 @@
 *.exe
 *.out
 *.app
+<<<<<<< .merge_file_a02688
 .idea/
+=======
+
+# PyCharm files
+.idea/
+cpp/.idea
+python/.idea
+>>>>>>> .merge_file_a05376

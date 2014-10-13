@@ -30,6 +30,20 @@ Illumination & Illumination::operator=(const Illumination & il)
 	return *this;
 }
 
+void Illumination::show() const
+{
+	out(std::cout);
+}
+void Illumination::out(std::ostream & ost) const
+{
+	ost << "# # # # # Illumination: # # # # #*" << std::endl;
+	ost << "ev0 = " << ev0 << std::endl;
+	ost << "psi = " << psi << std::endl;
+	ost << "alpha = " << alpha << std::endl;
+	ost << "# # # # # End of illumination # # # # #*" << std::endl;
+	
+}
+
 
 void spherical2cartesian(const double & r, const double & theta, const double & beta, double & x, double & y, double & z) //Convert spherical coordinates (r,theta,beta) to Cartesian coordinates (x,y,z).
 {
@@ -89,20 +103,20 @@ double Illumination::psi_prime(const double & theta, const double & beta) const
 }
 	
 // solid_angle
-solid_angle::solid_angle():theta(_theta), beta(_beta), subtend(_subtend)
+solid_angle::solid_angle():theta(_theta), beta(_beta), subtend(_subtend), theta_inc(_theta_inc), beta_inc(_beta_inc)//, angle_range(_angle_range)
 {
-	angle_range[0] = 0;
-	angle_range[1] = Pi;
-	angle_range[2] = 0;
-	angle_range[3] = Pi/2;
+	_angle_range[0] = 0;
+	_angle_range[1] = Pi;
+	_angle_range[2] = 0;
+	_angle_range[3] = Pi/2;
 	_theta_inc = Pi/180;
 	_beta_inc = Pi/180;
 	update();
 }
-solid_angle::solid_angle(const double *ar, double th_inc, double be_inc):theta(_theta), beta(_beta), subtend(_subtend)
+solid_angle::solid_angle(const double *ar, double th_inc, double be_inc):theta(_theta), beta(_beta), subtend(_subtend), theta_inc(_theta_inc), beta_inc(_beta_inc)//, angle_range(_angle_range)
 {
 	for (int i=0; i<4; i++)
-		angle_range[i] = ar[i];
+		_angle_range[i] = ar[i];
 	_theta_inc = th_inc;
 	_beta_inc = be_inc;
 	update();
@@ -117,14 +131,14 @@ solid_angle & solid_angle::operator=(const solid_angle & sa)
 	if (this == &sa)
 		return *this;
 	for (int i=0; i<4; i++)
-		angle_range[i] = sa.angle_range[i];
+		_angle_range[i] = sa.angle_range[i];
 	_theta_inc = sa._theta_inc;
 	_beta_inc = sa._beta_inc;
 	update();
 	return *this;
 }
 
-double solid_angle::domega(const double & theta, const double & beta) const
+double solid_angle::domega(const double & theta) const
 {
 	return std::sin(theta)*_theta_inc*_beta_inc;
 }
@@ -174,22 +188,26 @@ void solid_angle::update()
 
 void solid_angle::show() const
 {
-	using std::cout;
-	using std::endl;
-	cout << "angle range: ";
+	out(std::cout);
+}
+
+void solid_angle::out(std::ostream & ost) const
+{
+	ost << "angle range: ";
 	for (int i = 0; i < 4; i++)
-		cout << angle_range[i] << ' ';
-	cout << endl;
-	cout << "theta_inc = " << _theta_inc << endl;
-	cout << "beta_inc = " << _beta_inc << endl;
-	cout << "theta: ";
+		ost << angle_range[i] << ' ';
+	ost << std::endl;
+	ost << "theta_inc = " << _theta_inc << std::endl;
+	ost << "beta_inc = " << _beta_inc << std::endl;
+	ost << "theta: ";
 	for (vector<double>::const_iterator i = theta.begin(); i < theta.end(); i++)
-		cout << *i << ' ';
-	cout << endl;
-	cout << "beta: ";
+		ost << *i << ' ';
+	ost << std::endl;
+	ost << "beta: ";
 	for (vector<double>::const_iterator i = beta.begin(); i < beta.end(); i++)
-		cout << *i << ' ';
-	cout << endl;
+		ost << *i << ' ';
+	ost << std::endl;
+	ost << "Total subtended solid angle: " << subtend << std::endl;
 }
 
 double atten_mono(const double & ev0, 
@@ -198,19 +216,23 @@ double atten_mono(const double & ev0,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
-	if (psiprime == 0)
+	if ((psiprime < 1e-6) && (psiprime > -1e-6)) // Check if psiprime == 0
 		return 0;
+	double t = ml.thickness;
+	double rho = ml.density;
+	if (t == 0 || rho == 0)
+		return 1;
 	double mac0 = ml.mac_tot(ev0);
 	double mac1 = ml.mac_tot(ev);
 	double sp0 = std::sin(psi);
 	double sp1 = std::sin(psiprime);
-	double t = ml.thickness;
-	double rho = ml.density;
 	double temp = (mac0/sp0+mac1/sp1)*rho;
+	if (mac0+mac1*sp0/sp1 < 1e-50 && mac0+mac1*sp0/sp1 > -1e-50) // To avoid division by zero
+		return 0;
 	if (psiprime > 0)
-		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/((mac0+mac1*sp0/sp1)*rho);
+		return (1-std::exp(-(mac0/sp0+mac1/sp1)*rho*t))/(mac0+mac1*sp0/sp1);
 	else
-		return (std::exp(mac1*rho*t/sp1)-std::exp(-mac0*rho*t/sp0))/((mac0+mac1*sp0/sp1)*rho);
+		return (std::exp(mac1*rho*t/sp1)-std::exp(-mac0*rho*t/sp0))/(mac0+mac1*sp0/sp1);
 }
 
 double atten_refl(const double & ev0, 
@@ -219,6 +241,10 @@ double atten_refl(const double & ev0,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
+	double t = ml.thickness;
+	double rho = ml.density;
+	if (t == 0 || rho == 0)
+		return 0;
 	return std::exp(-(ml.mac_tot(ev0)/std::sin(psi)+ml.mac_tot(ev)/std::sin(psiprime))*ml.density*ml.thickness);
 }		
 		
@@ -226,6 +252,8 @@ double atten_trans_in(const double & ev0,
 		const double & psi, 
 		const Monolayer & ml)
 {
+	if (ml.density == 0 || ml.thickness == 0)
+		return 1;
 	return std::exp(-ml.mac_tot(ev0)/std::sin(psi)*ml.density*ml.thickness);
 }		
 		
@@ -233,5 +261,7 @@ double atten_trans_out(const double & ev,
 		const double & psiprime, 
 		const Monolayer & ml)
 {
+	if (ml.density == 0 || ml.thickness == 0)
+		return 1;
 	return std::exp(ml.mac_tot(ev)/std::sin(psiprime)*ml.density*ml.thickness);
 }

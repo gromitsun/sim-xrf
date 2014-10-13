@@ -3,6 +3,7 @@
 #define SAMPLE_HPP
 
 #include <vector>
+#include <iostream>
 
 class Compound
 {
@@ -22,6 +23,8 @@ public:
 	double mac_tot(const double & ev) const;
 	double dmac_rayleigh_pol(const double & ev, const double & theta, const double & beta) const;
 	double dmac_compton_pol(const double & ev, const double & theta, const double & beta) const;
+	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class Monolayer : public Compound
@@ -32,6 +35,7 @@ private:
 	double _layer;
 public:
 	Monolayer();
+	Monolayer(const Monolayer & ml);
 	Monolayer(const std::vector<int> & _Z_vec, const std::vector<double> & _p_vec, const double & density_, const double & thickness_, const double & layer_ = 0);
 	~Monolayer();
 	Monolayer & operator=(const Monolayer & ml);
@@ -39,6 +43,8 @@ public:
 	const double & thickness;
 	const double & layer;
 	void set_layer(int i);
+	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 class Sample
@@ -54,6 +60,8 @@ public:
 	const std::vector<Monolayer> & layer_vec;
 	const int & nlayers;
 	void add_layer(const Monolayer & monolayer_);
+	void show() const;
+	void out(std::ostream & ost) const;
 };
 
 #endif
