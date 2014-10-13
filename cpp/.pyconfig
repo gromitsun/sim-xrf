@@ -1,0 +1,1 @@
+nout = 3000, 30, 500, 500  # N of channels, N of Z, N of lines, N of thetas

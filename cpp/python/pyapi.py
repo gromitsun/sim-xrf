@@ -6,6 +6,8 @@ import os
 from tools.elementlookup import number2symbol  # Must be imported before loading the DLL.
 
 from . import libpath
+from . import __path__ as path
+path = path[0]
 
 try:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.so')
@@ -14,6 +16,11 @@ except OSError:
 
 from .classes.spectrum import *
 
+configf = open(path+'/../.pyconfig')
+config = {}
+for line in configf.readlines():
+   key, value = line.split('=')
+   config[key.strip()] = [int(x) for x in value.split('#')[0].split(',')]
 
 lib.sim.restype = None
 lib.sim.argtypes = [ctypes.c_char_p,
@@ -79,7 +86,7 @@ def sim(input_file,
 
 def calc(input_file="input.txt",
          output_file="output.txt",
-         nout=[3000, 30, 500, 500]):  # N of channels, N of Z, N of lines, N of thetas
+         nout=config['nout']):  # N of channels, N of Z, N of lines, N of thetas
     y_vec = np.zeros(nout[0])
     y_sep = np.zeros(nout[0] * (nout[1] + 2))
     Z_vec = np.zeros(nout[1], dtype=np.dtype(ctypes.c_int))
