@@ -1,14 +1,19 @@
+# pyapi.py
+# # # This file must be put in the same directory as main.cpp.
 import ctypes
+import numpy as np
 import os
 
-libpath = os.path.dirname(os.path.realpath(__file__)) + '/../Lib'
+from tools.elementlookup import number2symbol  # Must be imported before loading the DLL.
+
+from . import libpath
+
 try:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.so')
-except IOError:
+except OSError:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.dll')
 
-from spectrum import *
-from elementlookup import number2symbol
+from .classes.spectrum import Spectrum
 
 
 lib.sim.restype = None
@@ -50,6 +55,9 @@ def sim(input_file,
         il,
         sa,
         nout):
+    if not os.path.isfile(input_file):
+        raise IOError("File %s does not exit!" % input_file)
+
     lib.sim(ctypes.c_char_p(input_file),
             ctypes.c_char_p(output_file),
             y_vec.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
@@ -70,9 +78,9 @@ def sim(input_file,
             nout.ctypes.data_as(ctypes.POINTER(ctypes.c_int)))
 
 
-def get_data(input_file="input.txt",
-             output_file="output.txt",
-             nout=[2100, 30, 100, 100]):
+def calc(input_file="input.txt",
+         output_file="output.txt",
+         nout=[3000, 30, 500, 500]):  # N of channels, N of Z, N of lines, N of thetas
     y_vec = np.zeros(nout[0])
     y_sep = np.zeros(nout[0] * (nout[1] + 2))
     Z_vec = np.zeros(nout[1], dtype=int)
@@ -88,7 +96,9 @@ def get_data(input_file="input.txt",
     win_mat = np.zeros(20, dtype=int)
     il = np.zeros(3)
     sa = np.zeros(6)
-    nout = np.zeros(4, dtype=int)
+    nout = np.array(nout, dtype=int)
+
+    _nout = nout.copy()
 
     sim(input_file,
         output_file,
@@ -109,6 +119,10 @@ def get_data(input_file="input.txt",
         sa,
         nout)
 
+    # check out-of-range errors
+    if (nout > _nout).any():
+        raise IOError("Output out of range! \nGiven: " + str(_nout) + "\nNeeds: " + str(nout))
+
     xrf = Xrf(None, xrf_y[:nout[2]], xrf_ev[:nout[2]], lines[:nout[2]], Z_vec[:nout[1]], row[:nout[1] + 1])
     comp = Compton(None, comp_y[:nout[3]], comp_ev[:nout[3]])
     ray = Rayleigh(None, ray_y, il[0])
@@ -124,27 +138,28 @@ def get_data(input_file="input.txt",
     labels.append('Rayleigh')
     labels.append('Compton')
 
-    return Spectrum(y_vec[:n_channels], y_sep[:n_channels * (nout[1] + 2)].reshape(n_channels, -1), labels, xrf, ray,
+    return Spectrum(y_vec[:n_channels], y_sep[:n_channels * (nout[1] + 2)].reshape(-1, n_channels), labels, xrf, ray,
                     comp, _det, _il, omega)
 
 
-# print y_vec
-# print Z_vec
-# print row
-# print lines
-# print xrf_ev
-# print xrf_y
-# print comp_ev
-# print comp_y
-# print ray_y
-# print det
-# print n_channels
-# print win_mat
-# print il
-# print sa
-# print nout
+    # print y_vec
+    # print Z_vec
+    # print row
+    # print lines
+    # print xrf_ev
+    # print xrf_y
+    # print comp_ev
+    # print comp_y
+    # print ray_y
+    # print det
+    # print n_channels
+    # print win_mat
+    # print il
+    # print sa
+    # print nout
 
-spec = get_data()
+    # spec = calc()
 
-print spec.detector.window.material
-print spec.labels
+    # print spec.detector.window.material
+    # print spec.labels
+    # print spec.y_sep[0]

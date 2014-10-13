@@ -1,11 +1,14 @@
 # simpy.py
-import pyapi
 
 import time
+
+import python.pyapi as pyapi
+
 start = time.time()
-spec = pyapi.calc(input_file = "axo.txt",	output_file = "output.txt")
-print "Time used:", time.time() - start
-spec.show(xlim = [0,11], ylim = [1e-18,5e-6])
+spec = pyapi.calc(input_file="./input.txt", output_file="./output.txt")
+print 'Calculation finished.'
+print "Time used:", time.time() - start, 'sec.'
+spec.show(xlim=[0, 11], ylim=[1e-18, 5e-6])
 
 
 # import matplotlib.pyplot as plt
