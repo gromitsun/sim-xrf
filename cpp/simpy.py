@@ -1,5 +1,7 @@
 # simpy.py
 import python.pyapi as pyapi
+from python import plt_kwargs
+
 
 if __name__ == "__main__":
     import sys
@@ -20,9 +22,7 @@ if __name__ == "__main__":
     spec = pyapi.calc(input_file=input_file, output_file=output_file)
     print 'Calculation finished.'
     print "Time used:", time.time() - start, 'sec.'
-    kwargs = {key: value for key, value in pyapi.config.items()}
-    del (kwargs['nout'])
-    spec.show(**kwargs)
+    spec.show(**plt_kwargs)
 
 
     # import matplotlib.pyplot as plt

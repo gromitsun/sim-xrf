@@ -14,3 +14,6 @@ for line in configf.readlines():
         config[key.strip()] = [float(x) for x in value.split('#')[0].split(',')]
 
 configf.close()
+
+plt_kwargs = {key: value for key, value in config.items()}
+del (plt_kwargs['nout'])

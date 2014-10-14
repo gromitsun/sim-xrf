@@ -78,6 +78,8 @@ void sim(char * input_file,
 	std::ofstream fout;
 	fout.open(output_file);
 	spec.out(fout);
+	fout << std::endl;
+	det.out(fout);
 	fout.close();
 
    	// Return results

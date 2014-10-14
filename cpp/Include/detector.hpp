@@ -24,6 +24,8 @@ public:
 	void bin(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned) const;
 	void bin(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, const std::vector<int> & row) const;
 	void bin(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate) const;
+	void show() const;
+    void out(std::ostream & ost) const;
 };
 
 class Response
@@ -53,6 +55,9 @@ public:
 	
 	void set_gain(const double ev_gain);
 	double FWHM(double ev);
+
+	void show() const;
+    void out(std::ostream & ost) const;
 };
 
 		
@@ -72,6 +77,8 @@ public:
 	const double & thickness;
 	const double & density;
 	double transmission(double ev) const;
+	void show() const;
+    void out(std::ostream & ost) const;
 };
 		
 class Detector
@@ -91,6 +98,8 @@ public:
 	void genspec(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, bool det_response = true, bool det_window = true) const;
 	void genspec(const std::vector<double> & ev_raw, const std::vector<double> & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, const std::vector<int> & row, bool det_response = true, bool det_window = true) const;
 	void genspec(const double & ev_raw, const double & y_raw, std::vector<double> & y_binned, std::vector<double> & y_separate, bool det_response = true, bool det_window = true) const;
+	void show() const;
+    void out(std::ostream & ost) const;
 };
 
 #endif

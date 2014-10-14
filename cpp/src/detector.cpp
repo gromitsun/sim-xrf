@@ -89,6 +89,20 @@ void Channel::bin(const double & ev_raw, const double & y_raw, std::vector<doubl
 	y_separate[n_old+chn] = y_raw;
 }
 
+void Channel::show() const
+{
+    out(std::cout);
+}
+
+void Channel::out(std::ostream & ost) const
+{
+	ost << "Detector channel parameters:" << std::endl;
+	ost << "\tev_offset = " << ev_offset << std::endl;
+	ost << "\tev_gain = " << ev_gain << std::endl;
+	ost << "\tn_channels = " << n_channels << std::endl;
+    ost << std::endl;
+}
+
 
 Response::Response(double noise_,
 		double fano_,
@@ -129,6 +143,22 @@ double Response::FWHM(double ev)
 	return 2.3548*std::sqrt(sq(noise/2.3548)+3.58*fano*ev);
 }
 
+void Response::show() const
+{
+    out(std::cout);
+}
+
+void Response::out(std::ostream & ost) const
+{
+	ost << "Detector response parameters:" << std::endl;
+	ost << "\tfano = " << fano << std::endl;
+	ost << "\tgamma = " << gamma << std::endl;
+	ost << "\tfs = " << fs << std::endl;
+	ost << "\tft = " << ft << std::endl;
+    ost << std::endl;
+}
+
+
 
 Window::Window(std::string material_ ,
 	double thickness_,
@@ -155,6 +185,20 @@ double Window::transmission(double ev) const
 {
 	double _mac = CS_Total_CP(material.c_str(), ev/1000.);
 	return std::exp(-_mac*density*thickness);
+}
+
+void Window::show() const
+{
+    out(std::cout);
+}
+
+void Window::out(std::ostream & ost) const
+{
+	ost << "Detector window parameters:" << std::endl;
+	ost << "\tmaterial = " << material << std::endl;
+	ost << "\tthickness = " << thickness << std::endl;
+	ost << "\tdensity = " << density << std::endl;
+    ost << std::endl;
 }
 
 
@@ -397,4 +441,20 @@ void Detector::genspec(const double & ev_raw, const double & y_raw, std::vector<
 		else
 			channel.bin(ev_raw, y_raw, y_binned, y_separate);
 	}
+}
+
+void Detector::show() const
+{
+    out(std::cout);
+}
+
+void Detector::out(std::ostream & ost) const
+{
+    ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # Detector parameters # # # # #" << std::endl;
+	channel.out(ost);
+	response.out(ost);
+	window.out(ost);
+	ost << "# # # # # End of detector parameters # # # # #" << std::endl;
+    ost << "# ======================================== #" << std::endl;
 }
