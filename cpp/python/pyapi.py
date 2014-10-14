@@ -1,13 +1,11 @@
 # pyapi.py
-# # # This file must be put in the same directory as main.cpp.
 import ctypes
 import os
 
 from tools.elementlookup import number2symbol  # Must be imported before loading the DLL.
 
 from . import libpath
-from . import __path__ as path
-path = path[0]
+
 
 try:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.so')
@@ -15,12 +13,7 @@ except OSError:
     lib = ctypes.cdll.LoadLibrary(libpath + '/libsim.dll')
 
 from .classes.spectrum import *
-
-configf = open(path+'/../.pyconfig')
-config = {}
-for line in configf.readlines():
-   key, value = line.split('=')
-   config[key.strip()] = [int(x) for x in value.split('#')[0].split(',')]
+from . import config
 
 lib.sim.restype = None
 lib.sim.argtypes = [ctypes.c_char_p,

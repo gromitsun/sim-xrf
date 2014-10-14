@@ -2,13 +2,27 @@
 import python.pyapi as pyapi
 
 if __name__ == "__main__":
+    import sys
     import time
 
+    # Input and output file names
+    try:
+        input_file = sys.argv[1]
+        try:
+            output_file = sys.argv[2]
+        except IndexError:
+            output_file = "./output.txt"
+    except IndexError:
+        input_file = "./input.txt"
+        output_file = "./output.txt"
+
     start = time.time()
-    spec = pyapi.calc(input_file="./input.txt", output_file="./output.txt")
+    spec = pyapi.calc(input_file=input_file, output_file=output_file)
     print 'Calculation finished.'
     print "Time used:", time.time() - start, 'sec.'
-    spec.show(xlim=[0, 11], ylim=[1e-18, 5e-6])
+    kwargs = {key: value for key, value in pyapi.config.items()}
+    del (kwargs['nout'])
+    spec.show(**kwargs)
 
 
     # import matplotlib.pyplot as plt

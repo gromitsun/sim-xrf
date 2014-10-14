@@ -1,1 +1,3 @@
 nout = 3000, 30, 500, 500  # N of channels, N of Z, N of lines, N of thetas
+xlim = 0, 11
+ylim = 1e-14, 1e-4
