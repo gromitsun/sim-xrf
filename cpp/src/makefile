@@ -1,9 +1,10 @@
 # makefile
-
-XRL_PATH = "../xraylib"
+mkfile_path := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+XRL_PATH = $(abspath $(mkfile_path)/../xraylib)
+INCLUDE_PATH = $(abspath $(mkfile_path)/../Include)
+LIB_DIR = $(abspath $(mkfile_path)/../Lib)
 SRC_DIR = "."
 OBJ_DIR = "../obj"
-LIB_DIR = "../Lib/"
 SRC_FILES = $(wildcard *.cpp)
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 
@@ -19,24 +20,23 @@ endif
 
 g++ = g++
 
-all: $(OBJ_FILES) cwrapper.o ../Lib
-	ar crf ../Lib/libsim.a $(OBJ_FILES)
-	# $(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o ../Lib/libsim.$(DLIB)
-	$(g++) cwrapper.o ../Lib/libsim.a -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o ../Lib/libsim.$(DLIB) -fopenmp
-	
+all: $(OBJ_FILES) cwrapper.o $(LIB_DIR)
+	ar crf $(LIB_DIR)/libsim.a $(OBJ_FILES)
+	# $(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB)
+	$(g++) cwrapper.o $(LIB_DIR)/libsim.a -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp
+
 %.o: %.cpp
 	@echo "============="
 	@echo "Compiling $<"
-	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11 -fopenmp
-	
+	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I$(INCLUDE_PATH) -std=c++11 -fopenmp
+
 cwrapper.o: cwrapper.cc
 	@echo "============="
 	@echo "Compiling $<"
-	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I../Include -std=c++11 -fopenmp
+	@$(g++) -c $< -fPIC -o $@ -I$(XRL_PATH)/Include -I$(INCLUDE_PATH) -std=c++11 -fopenmp
 
-../Lib:
-	- mkdir ../Lib
+$(LIB_DIR):
+	- mkdir $(LIB_DIR)
 
 clean:
-	$(RM) -rf *.o *.$(DLIB) *.a all
-
+	$(RM) -rf *.o $(LIB_DIR)/*.$(DLIB) $(LIB_DIR)/*.a all
