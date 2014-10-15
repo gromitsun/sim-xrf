@@ -9,10 +9,13 @@ int main(int argc, char ** argv)
 {
 	std::string input_file = "input.txt", output_file = "out.txt";
 	if (argc > 2)
+	{
 		output_file = argv[2];
+		input_file = argv[1];
+	}
 	else if (argc > 1)
 		input_file = argv[1];
-		
+
 	Sample sp;
 	Illumination il;
 	solid_angle omega;
