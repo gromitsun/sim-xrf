@@ -12,10 +12,12 @@ ifeq ($(OS),Windows_NT)
 	#Windows stuff
 	# RM = del
 	DLIB = dll
+	XRL_LIB = windows
 else
 	#Linux stuff
 	# RM = rm
 	DLIB = so
+	XRL_LIB = linux
 endif
 
 g++ = g++
@@ -23,7 +25,7 @@ g++ = g++
 all: $(OBJ_FILES) cwrapper.o $(LIB_DIR)
 	ar crf $(LIB_DIR)/libsim.a $(OBJ_FILES)
 	# $(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB)
-	$(g++) cwrapper.o $(LIB_DIR)/libsim.a -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp
+	$(g++) cwrapper.o $(LIB_DIR)/libsim.a -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp
 
 %.o: %.cpp
 	@echo "============="
@@ -39,4 +41,4 @@ $(LIB_DIR):
 	- mkdir $(LIB_DIR)
 
 clean:
-	$(RM) -rf *.o $(LIB_DIR)/*.$(DLIB) $(LIB_DIR)/*.a all
+	$(RM) -rvf *.o $(LIB_DIR)/*.$(DLIB) $(LIB_DIR)/*.a all

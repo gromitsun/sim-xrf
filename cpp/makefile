@@ -10,18 +10,20 @@ ifeq ($(OS),Windows_NT)
 	# RM = del
 	DLIB = dll
 	EXE = exe
+	XRL_LIB = windows
 else
 	#Linux stuff
 	# RM = rm
 	DLIB = so
 	EXE = out
+	XRL_LIB = linux
 endif
 
 g++ = g++
 
 all: main.o
 	$(MAKE) -C ./src all
-	$(g++) main.o -L./Lib -lsim -L$(XRL_PATH)/Lib -lxrl -o main.$(EXE) -fopenmp #-static
+	$(g++) main.o -L./Lib -lsim -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -o main.$(EXE) -fopenmp #-static
 	- export LD_LIBRARY_PATH=$(LIB_PATH)
 
 
@@ -30,4 +32,4 @@ main.o: main.cpp
 
 clean:
 	$(MAKE) -C ./src clean
-	$(RM) -rf *.o main.exe ./Lib/*.a ./Lib/*.$(DLIB) all
+	$(RM) -rvf *.o main.exe $(LIB_PATH)/*.a $(LIB_PATH)/*.$(DLIB) $(LIB_PATH) all
