@@ -30,7 +30,7 @@ lib.sim.argtypes = [ctypes.c_char_p,
                     ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_int),
-                    ctypes.POINTER(ctypes.c_int),
+                    ctypes.c_char_p,
                     ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_int)]
@@ -71,7 +71,7 @@ def sim(input_file,
             ray_y.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             det.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             n_channels.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
-            win_mat.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+            win_mat,
             il.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             sa.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             nout.ctypes.data_as(ctypes.POINTER(ctypes.c_int)))
@@ -92,7 +92,7 @@ def calc(input_file="input.txt",
     ray_y = np.zeros(1)
     det = np.zeros(9)
     n_channels = np.zeros(1, dtype=np.dtype(ctypes.c_int))
-    win_mat = np.zeros(20, dtype=np.dtype(ctypes.c_int))
+    win_mat = ctypes.create_string_buffer(20)
     il = np.zeros(3)
     sa = np.zeros(6)
     nout = np.array(nout, dtype=np.dtype(ctypes.c_int))
@@ -125,7 +125,6 @@ def calc(input_file="input.txt",
     xrf = Xrf(None, xrf_y[:nout[2]], xrf_ev[:nout[2]], lines[:nout[2]], Z_vec[:nout[1]], row[:nout[1] + 1])
     comp = Compton(None, comp_y[:nout[3]], comp_ev[:nout[3]])
     ray = Rayleigh(None, ray_y, il[0])
-    win_mat = ''.join(chr(ch) for ch in win_mat)
     _det = Detector(Channel(*det[:2], n_channels=n_channels),
                     Response(*det[2:-2], ev_gain=det[1]),
                     Window(win_mat, *det[-2:]))

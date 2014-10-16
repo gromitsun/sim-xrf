@@ -27,7 +27,7 @@ extern "C"
 	// Detector
 	double * det_,
 	int * n_channels,
-	int * win_mat,
+	char * win_mat,
 	// Illumination
 	double * il_,
 	// Solid angle
@@ -56,7 +56,7 @@ void sim(char * input_file,
 	// Detector
 	double * det_,
 	int * n_channels,
-	int * win_mat,
+	char * win_mat,
 	// Illumination
 	double * il_,
 	// Solid angle
@@ -177,9 +177,12 @@ void sim(char * input_file,
 	*(det_++) = det.response.ft;
 	*(det_++) = det.window.thickness;
 	*det_ = det.window.density;
-	for (int i = 0; i < det.window.material.length(); i++)
-		*(win_mat++) = int(det.window.material.at(i));
-	*(win_mat) = int('\n');
+//	for (int i = 0; i < det.window.material.length(); i++)
+//		*(win_mat++) = int(det.window.material.at(i));
+//	*(win_mat) = int('\n');
+
+    for (auto i: det.window.material)
+        *(win_mat++) = i;
 
 	// Illumination
 	*(il_++) = il.ev0;
