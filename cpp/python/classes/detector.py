@@ -1,6 +1,10 @@
 # detector.py
 import numpy as np
-import xraylib as xrl
+
+try:
+    import xraylib as xrl
+except ImportError:
+    from ..tools import xraylib as xrl
 
 
 def energy_to_channel(energy, offset=0., gain=10.):
@@ -54,6 +58,7 @@ class Response(object):
         ft:
         ev_gain:
     """
+
     def __init__(self,
                  noise=100,
                  fano=0.114,
@@ -61,7 +66,6 @@ class Response(object):
                  fs=0.03,
                  ft=0.02,
                  ev_gain=None):
-
         self.noise = noise
         self.fano = fano
         self.gamma = gamma
@@ -95,6 +99,7 @@ class Window(object):
         density:
             Mass density of the filtering window material. In g/cm^3.
     """
+
     def __init__(self,
                  material='Be',
                  thickness=24e-4,
@@ -128,6 +133,7 @@ class Detector(object):
         response:   A detector response object.
         window: A detector window object.
     """
+
     def __init__(self, channel=Channel(), response=Response(), window=Window()):
         self.channel = channel
         self.response = response

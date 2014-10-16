@@ -8,12 +8,14 @@
 *.so
 *.dylib
 *.dll
+!libxrl-*.dll
+!libxrl.so*
 
 # Compiled Static libraries
 *.lai
 *.la
 *.a
-!libxrl.dll.a
+!libxrl.a
 *.lib
 
 # Executables
