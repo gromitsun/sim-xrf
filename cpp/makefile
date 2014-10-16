@@ -24,8 +24,8 @@ g++ = g++
 all: main.o
 	$(MAKE) -C ./src all
 	$(g++) main.o -L./Lib -lsim -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -o main.$(EXE) -fopenmp #-static
-	- export LD_LIBRARY_PATH=$(LIB_PATH)
-
+	echo export LD_LIBRARY_PATH=$(LIB_PATH) > init.sh
+	echo export OMP_NUM_THREADS=16 >> init.sh
 
 main.o: main.cpp
 	$(g++) -c main.cpp -I$(INCLUDE_PATH) -I$(XRL_PATH)/Include -std=c++11 -fopenmp
