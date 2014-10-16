@@ -35,3 +35,6 @@ python/.idea
 # Compiled Python files
 *.pyc
 *.pyd
+
+# Others
+init.sh
