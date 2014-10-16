@@ -37,4 +37,4 @@ python/.idea
 *.pyd
 
 # Others
-init.sh
+*.sh
