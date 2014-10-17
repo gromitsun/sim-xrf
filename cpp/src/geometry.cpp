@@ -244,7 +244,7 @@ double atten_refl(const double & ev0,
 	double t = ml.thickness;
 	double rho = ml.density;
 	if (t == 0 || rho == 0)
-		return 0;
+		return 1;
 	return std::exp(-(ml.mac_tot(ev0)/std::sin(psi)+ml.mac_tot(ev)/std::sin(psiprime))*ml.density*ml.thickness);
 }		
 		
