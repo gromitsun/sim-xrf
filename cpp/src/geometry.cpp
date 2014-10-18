@@ -245,6 +245,8 @@ double atten_refl(const double & ev0,
 	double rho = ml.density;
 	if (t == 0 || rho == 0)
 		return 1;
+	else if (psi == 0 || psiprime == 0)
+	    return 0;
 	return std::exp(-(ml.mac_tot(ev0)/std::sin(psi)+ml.mac_tot(ev)/std::sin(psiprime))*ml.density*ml.thickness);
 }		
 		
@@ -254,6 +256,8 @@ double atten_trans_in(const double & ev0,
 {
 	if (ml.density == 0 || ml.thickness == 0)
 		return 1;
+	else if (psi == 0)
+	    return 0;
 	return std::exp(-ml.mac_tot(ev0)/std::sin(psi)*ml.density*ml.thickness);
 }		
 		
@@ -263,5 +267,7 @@ double atten_trans_out(const double & ev,
 {
 	if (ml.density == 0 || ml.thickness == 0)
 		return 1;
+	else if (psiprime == 0)
+	    return 0;
 	return std::exp(ml.mac_tot(ev)/std::sin(psiprime)*ml.density*ml.thickness);
 }
