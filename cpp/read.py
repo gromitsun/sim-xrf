@@ -25,7 +25,7 @@ def read(fname):
 
     return ev, a, labels
 
-def plot(ev, a, labels, xlim=None, ylim=None):
+def plot(ev, a, labels, xlim=None, ylim=None, show=True):
     ax = plt.subplot(111)
     plt.plot(ev / 1e3, a.T)
     plt.yscale('log')
@@ -36,7 +36,9 @@ def plot(ev, a, labels, xlim=None, ylim=None):
     # Shrink current axis by 20%
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    plt.legend(labels, loc='best', ncol=1, bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.legend(labels, loc='upper right', ncol=1, bbox_to_anchor=(1.35, 1), borderaxespad=0.)
+    if show:
+        plt.show()
 
 
 
@@ -57,4 +59,3 @@ if __name__ == '__main__':
     plt.figure()
     plt.title('Spectrum read from %s' % fname)
     plot(ev, a, labels, xlim=plt_kwargs['xlim'], ylim=plt_kwargs['ylim'])
-    plt.show()
