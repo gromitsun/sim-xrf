@@ -11,8 +11,8 @@ def pnb(ev, y, bg, peak_center, peak_width, bg_range=None, normalize=True):
     """
 
     :param ev: Energy array in eV.
-    :param y: Total spectrum array.
-    :param bg: Background spectrum array.
+    :param y: Total spectrum array. First dimension must be energy/channel number.
+    :param bg: Background spectrum array. First dimension must be energy/channel number.
     :param peak_center: peak center in eV.
     :param peak_width: peak width in eV.
     :param bg_range: Range in which background is sampled. List with length of multiples of two.
@@ -51,3 +51,7 @@ def pnb_snip(ev, y, peak_center, peak_width=100, FWHM=snip.FWHM, offset=0., gain
 
 def pnb_ascalc(ev, y, total, peak_center, peak_width):
     return pnb(ev, total, total - y, peak_center, peak_width, normalize=False)
+
+
+def snr(P, B):
+    return P/np.sqrt(P + 2*B)
