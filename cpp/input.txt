@@ -5,7 +5,7 @@
 # The start of a part is indicated by part-name followed by a ":" in a single line.
 # The ending of a part is indicated by empty lines (can contain whitespaces, tabs, etc.).
 # The end of the lowest level part needs one empty line; the end of the second lowest level part needs two, and so on.
-# Contents following '#' will be ignored.
+# Contents after the first '#' will be ignored.
 # Leading and ending whitespaces, tabs, etc. in one line will be ignored.
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 Sample: # Define sample parameters.
