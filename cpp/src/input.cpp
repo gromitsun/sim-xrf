@@ -7,6 +7,14 @@
 #include "input.hpp"
 #include "constants.hpp"
 
+inline std::string trim_comment(const std::string & s, const std::string & delimiter="#")
+{
+    if (s.empty())
+        return s;
+    else
+        return s.substr(0, s.find(delimiter));
+}
+
 inline std::string trim_right(
   const std::string & s,
   const std::string & delimiters = " \f\n\r\t\v" )
@@ -29,7 +37,7 @@ inline std::string trim(
   const std::string & s,
   const std::string & delimiters = " \f\n\r\t\v" )
 {
-	return trim_left(trim_right(s, delimiters), delimiters);
+	return trim_left(trim_right(trim_comment(s), delimiters), delimiters);
 }
 
 inline std::vector<int> parse_vec_int(const std::string & s)
