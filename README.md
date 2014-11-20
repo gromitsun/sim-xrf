@@ -1,6 +1,6 @@
 sim-xrf
 =======
-This is a python/C++ program for simulating X-Ray Fluorescence (XRF) spectrum aquired at a synchrotron radiation beamline.
+This is a python/C++ program for simulating X-Ray Fluorescence (XRF) spectrum acquired at a synchrotron radiation beamline.
 
 
 Installation
@@ -9,3 +9,21 @@ The source files need to be compiled with g++ 4.7+. Xraylib with python bindings
 
 Xraylib is available at https://github.com/tschoonj/xraylib.
 
+Compiling Xraylib
+-------
+
+
+Compiling sim-xrf
+-------
+
+Running sim-xrf
+=======
+
+Input file
+-------
+
+Running in C++ mode
+-------
+
+Running in python mode
+-------
