@@ -34,6 +34,7 @@ void Illumination::show() const
 {
 	out(std::cout);
 }
+
 void Illumination::out(std::ostream & ost) const
 {
 	ost << "# # # # # Illumination: # # # # #*" << std::endl;

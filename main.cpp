@@ -3,6 +3,7 @@
 #include <string>
 
 #include "spectrum.hpp"
+#include "dose.hpp"
 #include "input.hpp"
 
 int main(int argc, char ** argv)
@@ -34,6 +35,9 @@ int main(int argc, char ** argv)
 	std::cout << "Calculating spectrum..." << std::endl;
 	Spectrum spec(sp, il, omega, det, true, true, true);
 
+	// Calculate dose
+	Dose ds(il, sp);
+
 	// Show results on screen
 	spec.show();
 
@@ -44,8 +48,9 @@ int main(int argc, char ** argv)
 	
 	spec.out(fout);
 	fout << std::endl;
+	ds.out(fout);
 	det.out(fout);
 	std::cout << "Done!" << std::endl;
 	
-	return 1;
+	return 0;
 }
