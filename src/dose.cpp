@@ -49,12 +49,12 @@ void Dose::show() const
 
 void Dose::out(std::ostream & ost) const
 {
-	ost << "# # # # # Radiation dosage: # # # # #*" << std::endl;
+	ost << "# # # # # Radiation dosage: # # # # #" << std::endl;
 	ost << "For " << n_photons << " photon(s) incident, "
 	    << "beam cross-sectional area = " << beam_cross_section << " cm^2 "
 	    << "(d = " << std::sqrt(beam_cross_section/Pi)*2e7 << " nm):" << std::endl;
 	for (int i=0; i<dose_vec.size(); i++)
 	    ost << "\tLayer #" << i+1 << ":\t" << dose_vec[i] << " Gy" << std::endl;
 	ost << "\tTotal:\t" << total_dose << " Gy" << std::endl;
-	ost << "# # # # # End of radiation dosage # # # # #*" << std::endl;
+	ost << "# # # # # End of radiation dosage # # # # #" << std::endl;
 }

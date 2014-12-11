@@ -49,6 +49,7 @@ int main(int argc, char ** argv)
 	spec.out(fout);
 	fout << std::endl;
 	ds.out(fout);
+	il.out(fout);
 	det.out(fout);
 	std::cout << "Done!" << std::endl;
 	

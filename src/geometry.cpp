@@ -41,13 +41,13 @@ void Illumination::show() const
 
 void Illumination::out(std::ostream & ost) const
 {
-	ost << "# # # # # Illumination: # # # # #*" << std::endl;
+	ost << "# # # # # Illumination: # # # # #" << std::endl;
 	ost << "ev0 = " << ev0 << std::endl;
 	ost << "psi = " << psi << std::endl;
 	ost << "alpha = " << alpha << std::endl;
 	ost << "Number of incident photons = " << n_photons << std::endl;
 	ost << "Beam cross sectional area = " << beam_cross_section << " cm^2" << std::endl;
-	ost << "# # # # # End of illumination # # # # #*" << std::endl;
+	ost << "# # # # # End of illumination # # # # #" << std::endl;
 	
 }
 

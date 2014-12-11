@@ -20,8 +20,8 @@ private:
 	std::vector<int> _row;
 public:
 	Xrf(); //default constructor
-	Xrf(double ev0, const Compound & c);
-	Xrf(double ev0, const Compound & c, const solid_angle omega);
+	Xrf(double ev0, const Compound & c, double n_photons=1);
+	Xrf(double ev0, const Compound & c, const solid_angle omega, double n_photons=1);
 	Xrf(const Sample & s, const Illumination & il, const solid_angle & omega_);
 	// ~Xrf();
 	Xrf & operator=(const Xrf & x);
@@ -48,7 +48,7 @@ private:
 	double _ev0;
 public:
 	Rayleigh(); //default constructor
-	Rayleigh(double ev0_, const Compound & c, const solid_angle & omega_, bool calc_sum = true);
+	Rayleigh(double ev0_, const Compound & c, const solid_angle & omega_, double n_photons=1, bool calc_sum = true);
 	Rayleigh(const Sample & s, const Illumination & il, const solid_angle & omega_);
 	// ~Rayleigh();
 	Rayleigh & operator=(const Rayleigh & r);
@@ -73,7 +73,7 @@ private:
 	std::vector<double> _y_vec;
 public:
 	Compton(); //default constructor
-	Compton(double ev0_, const Compound & c, const solid_angle & omega_, bool calc_ev = true, bool calc_sum = true);
+	Compton(double ev0_, const Compound & c, const solid_angle & omega_, double n_photons=1, bool calc_ev = true, bool calc_sum = true);
 	Compton(const Sample & s, const Illumination & il, const solid_angle & omega_);
 	// ~Compton();
 	Compton & operator=(const Compton & c);

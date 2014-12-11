@@ -85,6 +85,7 @@ void sim(char * input_file,
 	spec.out(fout);
 	fout << std::endl;
 	ds.out(fout);
+	il.out(fout);
 	det.out(fout);
 	fout.close();
 
