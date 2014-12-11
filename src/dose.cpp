@@ -9,15 +9,17 @@ Dose::Dose(const Sample & sp, const Illumination & il) : n_photons(_n_photons), 
     _n_photons = il.n_photons;
     _beam_cross_section = il.beam_cross_section;
     _total_dose = 0;
-    double joules_absorbed, matrix_mass;
+    double joules_absorbed, matrix_mass, n_photons_in=n_photons, n_photons_out;
     for (auto ml : sp.layer_vec)
     {
         if (ml.thickness > 0)
         {
-			joules_absorbed = n_photons*(1 - std::exp(-ml.mac_tot(il.ev0)*ml.thickness))*il.ev0*eV_in_Joules;
+        	n_photons_out = n_photons_in*std::exp(-ml.mac_tot(il.ev0)*ml.thickness);
+			joules_absorbed = (n_photons_in - n_photons_out)*il.ev0*eV_in_Joules;
 			matrix_mass = ml.thickness*beam_cross_section*ml.density*1000/std::sin(il.psi);
 			_dose_vec.push_back(joules_absorbed/matrix_mass);
 			_total_dose += dose_vec.back();
+			n_photons_in = n_photons_out;
         }
         else
         	_dose_vec.push_back(-1);
