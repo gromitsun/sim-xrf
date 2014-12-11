@@ -40,6 +40,14 @@ def plot(ev, a, labels, xlim=None, ylim=None, show=True):
     if show:
         plt.show()
 
+def dose(fname):
+    f = open(fname)
+    dose = []
+    for line in f.readlines():
+        if ('Layer' in line) and ('Gy' in line):
+            dose.append(float(line.split(':')[-1].split()[0]))
+    f.close()
+    return np.array(dose)
 
 
 
