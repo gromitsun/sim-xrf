@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
 	Spectrum spec(sp, il, omega, det, true, true, true);
 
 	// Calculate dose
-	Dose ds(il, sp);
+	Dose ds(sp, il);
 
 	// Show results on screen
 	spec.show();

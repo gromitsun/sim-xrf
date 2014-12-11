@@ -200,7 +200,7 @@ void readfile(std::string filename, Sample & sp, Illumination & il, solid_angle 
 		{
 			std::cout << "Reading in illumination data..." << std::endl;
 			// read illumination
-			double ev0, psi, alpha;
+			double ev0, psi, alpha, n_photons=1, beam_cross_section=1e-12*Pi;
 			while (getline(fin, s) && !trim(s).empty())
 			{
 				std::string name, value;
@@ -218,10 +218,18 @@ void readfile(std::string filename, Sample & sp, Illumination & il, solid_angle 
 					{
 						alpha = deg_to_rad(std::stod(value));
 					}
+					else if (name == "n_photons")
+					{
+						n_photons = std::stod(value);
+					}
+					else if (name == "beam_cross_section")
+					{
+						beam_cross_section = std::stod(value);
+					}
 				}
 				
 			}
-			il = Illumination(ev0, psi, alpha);
+			il = Illumination(ev0, psi, alpha, n_photons, beam_cross_section);
 		}
 		
 		else if (s.find("Solid angle:") != std::string::npos)

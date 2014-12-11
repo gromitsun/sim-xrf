@@ -18,13 +18,17 @@ private:
 	double _ev0;
 	double _psi;
 	double _alpha;
+	double _n_photons;
+	double _beam_cross_section;
 public:
-	Illumination(double ev0_ = 1e4, double psi_ = Pi/4, double alpha_ = 0);
+	Illumination(double ev0_ = 1e4, double psi_ = Pi/4, double alpha_ = 0, double n_photons_=1, double beam_cross_section_=1e-12*Pi);
 	~Illumination();
 	Illumination & operator=(const Illumination & il);
 	const double & ev0;
 	const double & psi;
 	const double & alpha;
+	const double & n_photons;
+	const double & beam_cross_section;
 	double psi_prime(const double & theta, const double & beta) const;
 	void show() const;
 	void out(std::ostream & ost) const;

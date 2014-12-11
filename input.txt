@@ -49,6 +49,8 @@ Illumination:
 	ev0 = 1e4 # Incident beam energy, in eV.
 	psi = 45 # Incident (polar) angle (w.r.t. sample surface), in deg.
 	alpha = 0 # Incident (azimuthal) angle (w.r.t. major plane of polarization of the incident radiation), in deg.
+	n_photons = 1e10 # Total number of incident photons. Optional, default is 1.
+	beam_cross_section = 3.14e-12 # Beam cross-sectional area, in cm^2. Optional default is 1e-12*Pi (i.e. 20 nm diameter circle).
 
 Solid angle:
 	angle_range = 80, 100, 0, 180 # Angle range of the detector active part. [theta_begin, theta_end, beta_begin, beta_end]. In deg.

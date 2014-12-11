@@ -45,7 +45,9 @@ class SolidAngle(object):
 
 
 class Illumination(object):
-    def __init__(self, ev0=1e4, psi=0, alpha=0):
+    def __init__(self, ev0=1e4, psi=0, alpha=0, n_photons=1, beam_cross_section=1e-12*np.pi):
         self.ev0 = ev0
         self.psi = psi
         self.alpha = alpha
+        self.n_photons = n_photons
+        self.beam_cross_section = beam_cross_section

@@ -8,11 +8,13 @@ using std::vector;
 
 
 //Illumination
-Illumination::Illumination(double ev0_, double psi_, double alpha_) : ev0(_ev0), psi(_psi), alpha(_alpha)
+Illumination::Illumination(double ev0_, double psi_, double alpha_, double n_photons_, double beam_cross_section_) : ev0(_ev0), psi(_psi), alpha(_alpha), n_photons(_n_photons), beam_cross_section(_beam_cross_section)
 {
 	_ev0 = ev0_;
 	_psi = psi_;
 	_alpha = alpha_;
+	_n_photons = n_photons_;
+	_beam_cross_section = beam_cross_section_;
 }
 Illumination::~Illumination()
 {
@@ -26,6 +28,8 @@ Illumination & Illumination::operator=(const Illumination & il)
 		_ev0 = il.ev0;
 		_psi = il.psi;
 		_alpha = il.alpha;
+		_n_photons = il.n_photons;
+		_beam_cross_section = il.beam_cross_section;
 	}
 	return *this;
 }
@@ -41,6 +45,8 @@ void Illumination::out(std::ostream & ost) const
 	ost << "ev0 = " << ev0 << std::endl;
 	ost << "psi = " << psi << std::endl;
 	ost << "alpha = " << alpha << std::endl;
+	ost << "Number of incident photons = " << n_photons << std::endl;
+	ost << "Beam cross sectional area = " << beam_cross_section << " cm^2" << std::endl;
 	ost << "# # # # # End of illumination # # # # #*" << std::endl;
 	
 }

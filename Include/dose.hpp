@@ -13,13 +13,15 @@ class Dose
 private:
 	double _n_photons;
 	double _beam_cross_section;
+	double _total_dose;
 	std::vector<double> _dose_vec;
 public:
-	Dose(Illumination il, Sample sp, double n_photons_=1, double beam_cross_section_=1);
+	Dose(const Sample & sp, const Illumination & il);
 	~Dose();
 	Dose & operator=(const Dose & d);
 	const double & n_photons;
 	const double & beam_cross_section;
+	const double & total_dose;
 	const std::vector<double> & dose_vec;
 	void show() const;
 	void out(std::ostream & ost) const;

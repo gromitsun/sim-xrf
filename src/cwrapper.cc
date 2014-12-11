@@ -4,6 +4,7 @@
 
 #include "spectrum.hpp"
 #include "input.hpp"
+#include "dose.hpp"
 extern "C"
 {
 	// __declspec(dllexport) 
@@ -32,6 +33,7 @@ extern "C"
 	double * il_,
 	// Solid angle
 	double * sa,
+	double * dose,
 	int * nout);
 }
 
@@ -61,6 +63,8 @@ void sim(char * input_file,
 	double * il_,
 	// Solid angle
 	double * sa,
+	// Radiation dose
+	double * dose,
 	int * nout)
 {
 	Sample sp;
@@ -73,12 +77,14 @@ void sim(char * input_file,
 	
 	// Calculate spectrum
 	Spectrum spec(sp, il, omega, det, true, true, true);
+	Dose ds(sp, il);
 	
 	// Save results to file
 	std::ofstream fout;
 	fout.open(output_file);
 	spec.out(fout);
 	fout << std::endl;
+	ds.out(fout);
 	det.out(fout);
 	fout.close();
 
@@ -161,6 +167,7 @@ void sim(char * input_file,
 	nout[1] = spec.xrf.Z_vec.size();
 	nout[2] = spec.xrf.lines.size();
 	nout[3] = spec.comp.ev_vec.size();
+	nout[4] = ds.dose_vec.size();
 
 
 	// Rayleigh
@@ -187,12 +194,18 @@ void sim(char * input_file,
 	// Illumination
 	*(il_++) = il.ev0;
 	*(il_++) = il.psi;
-	*(il_) = il.alpha;
+	*(il_++) = il.alpha;
+	*(il_++) = il.n_photons;
+	*(il_) = il.beam_cross_section;
 
 	// Solid angle
 	for (int i = 0; i < 4; i++)
 		*(sa++) = omega.angle_range[i];
 	*(sa++) = omega.theta_inc;
 	*(sa) = omega.beta_inc;
+
+	// Radiation dosage
+	for (int i=0; i<ds.dose_vec.size(); i++)
+		*(dose+i) = ds.dose_vec[i];
 }
 

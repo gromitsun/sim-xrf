@@ -33,6 +33,7 @@ lib.sim.argtypes = [ctypes.c_char_p,
                     ctypes.c_char_p,
                     ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_double),
+                    ctypes.POINTER(ctypes.c_double),
                     ctypes.POINTER(ctypes.c_int)]
 
 
@@ -53,6 +54,7 @@ def sim(input_file,
         win_mat,
         il,
         sa,
+        dose,
         nout):
     if not os.path.isfile(input_file):
         raise IOError("File %s does not exit!" % input_file)
@@ -74,12 +76,13 @@ def sim(input_file,
             win_mat,
             il.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             sa.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+            dose.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
             nout.ctypes.data_as(ctypes.POINTER(ctypes.c_int)))
 
 
 def calc(input_file="input.txt",
          output_file="output.txt",
-         nout=config['nout']):  # N of channels, N of Z, N of lines, N of thetas
+         nout=config['nout'], return_dose=False):  # N of channels, N of Z, N of lines, N of thetas, N of layers
     y_vec = np.zeros(nout[0])
     y_sep = np.zeros(nout[0] * (nout[1] + 2))
     Z_vec = np.zeros(nout[1], dtype=np.dtype(ctypes.c_int))
@@ -93,8 +96,9 @@ def calc(input_file="input.txt",
     det = np.zeros(9)
     n_channels = np.zeros(1, dtype=np.dtype(ctypes.c_int))
     win_mat = ctypes.create_string_buffer(20)
-    il = np.zeros(3)
+    il = np.zeros(5)
     sa = np.zeros(6)
+    dose = np.zeros(20)
     nout = np.array(nout, dtype=np.dtype(ctypes.c_int))
 
     _nout = nout.copy()
@@ -116,6 +120,7 @@ def calc(input_file="input.txt",
         win_mat,
         il,
         sa,
+        dose,
         nout)
 
     # check out-of-range errors
@@ -136,28 +141,32 @@ def calc(input_file="input.txt",
     labels.append('Rayleigh')
     labels.append('Compton')
 
-    return Spectrum(y_vec[:n_channels], y_sep[:n_channels * (nout[1] + 2)].reshape(-1, n_channels), labels, xrf, ray,
-                    comp, _det, _il, omega)
+    if return_dose:
+        return Spectrum(y_vec[:n_channels], y_sep[:n_channels * (nout[1] + 2)].reshape(-1, n_channels), labels, xrf,
+                        ray, comp, _det, _il, omega), dose[:nout[5]]
+    else:
+        return Spectrum(y_vec[:n_channels], y_sep[:n_channels * (nout[1] + 2)].reshape(-1, n_channels), labels, xrf,
+                        ray, comp, _det, _il, omega)
 
 
-    # print y_vec
-    # print Z_vec
-    # print row
-    # print lines
-    # print xrf_ev
-    # print xrf_y
-    # print comp_ev
-    # print comp_y
-    # print ray_y
-    # print det
-    # print n_channels
-    # print win_mat
-    # print il
-    # print sa
-    # print nout
+        # print y_vec
+        # print Z_vec
+        # print row
+        # print lines
+        # print xrf_ev
+        # print xrf_y
+        # print comp_ev
+        # print comp_y
+        # print ray_y
+        # print det
+        # print n_channels
+        # print win_mat
+        # print il
+        # print sa
+        # print nout
 
-    # spec = calc()
+        # spec = calc()
 
-    # print spec.detector.window.material
-    # print spec.labels
-    # print spec.y_sep[0]
+        # print spec.detector.window.material
+        # print spec.labels
+        # print spec.y_sep[0]
