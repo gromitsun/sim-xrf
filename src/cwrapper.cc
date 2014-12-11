@@ -206,7 +206,9 @@ void sim(char * input_file,
 	*(sa) = omega.beta_inc;
 
 	// Radiation dosage
-	for (int i=0; i<ds.dose_vec.size(); i++)
-		*(dose+i) = ds.dose_vec[i];
+	for (auto i : ds.dose_vec)
+		*(dose++) = i;
+
+	return;
 }
 

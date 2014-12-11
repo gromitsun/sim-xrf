@@ -98,7 +98,7 @@ def calc(input_file="input.txt",
     win_mat = ctypes.create_string_buffer(20)
     il = np.zeros(5)
     sa = np.zeros(6)
-    dose = np.zeros(20)
+    dose = np.zeros(nout[4])
     nout = np.array(nout, dtype=np.dtype(ctypes.c_int))
 
     _nout = nout.copy()
