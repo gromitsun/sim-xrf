@@ -24,8 +24,8 @@ g++ = g++
 
 all: $(OBJ_FILES) cwrapper.o $(LIB_DIR)
 	ar crf $(LIB_DIR)/libsim.a $(OBJ_FILES)
-	# $(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB)
-	$(g++) cwrapper.o $(LIB_DIR)/libsim.a -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp
+	$(g++) $(OBJ_FILES) cwrapper.o -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp
+	# $(g++) cwrapper.o $(LIB_DIR)/libsim.a -L$(XRL_PATH)/Lib/$(XRL_LIB) -lxrl -shared -fPIC -o $(LIB_DIR)/libsim.$(DLIB) -fopenmp # works for mingw-w64 on windows, not for linux.
 
 %.o: %.cpp
 	@echo "============="
