@@ -80,7 +80,7 @@ void sim(char * input_file,
 	Dose ds(sp, il);
 	
 	// Save results to file
-	std::ofstream fout;
+	static std::ofstream fout;
 	fout.open(output_file);
 	spec.out(fout);
 	fout << std::endl;
