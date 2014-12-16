@@ -13,18 +13,17 @@ Xraylib is available at https://github.com/tschoonj/xraylib.
 
 1.1. Compiling Xraylib
 -------
-Pre-compiled Xraylib libraries for Ubuntu Linux and Windows are in the /xraylib/ folder. If the libraries do not work, Xraylib has to be recompiled manually.
+Instructions on compiling XrayLib can be found at https://github.com/tschoonj/xraylib/wiki.
 
-After compilation of Xraylib, change the XRL_PATH in makefile and src/makefile to the actual path of the installed xraylib.
-Or copy the library files to xraylib/Lib/linux or xraylib/Lib/windows.
+After compilation of XrayLib, change the "XRL_PATH" in "variables.mk" to the actual installation directory of XrayLib.
 
 1.2. Compiling sim-xrf
 -------
-In the top directory do "make". If your c++ compiler is not called with "g++", you must edit the "g++ = g++" line in makefile and src/makefile.
+In the top directory do "make". If your c++ compiler is not called with "g++", modify the variable "g++" in "variables.mk" according to your actual compiler.
 
 1.3. Initialization
 -------
-Initialize the program by running "source init.sh" before running the program.
+Initialize the program by running ". init.sh" before running the program.
 
 
 2. Running sim-xrf

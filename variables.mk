@@ -8,8 +8,10 @@ LIB_PATH = $(abspath $(mkfile_path)/Lib)
 # XrayLib paths
 XRL_PATH = "D:\Program Files\xraylib 64-bit"
 
+# C++11 compiler
+g++ = g++
 
-
+# Others
 ifeq ($(OS),Windows_NT)
 	#Windows stuff
 	# RM = del
@@ -26,5 +28,4 @@ else
 	XRL_LIB = $(XRL_PATH)/src/.lib
 endif
 
-# C++11 compiler
-g++ = g++
+
