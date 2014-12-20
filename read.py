@@ -16,7 +16,7 @@ def read(fname):
             ev_gain = float(line.split('=')[1])
         elif 'n_channels' in line:
             n_channels = float(line.split('=')[1])
-        elif 'Z =' in line:
+        elif ('Z =' in line) and ('(' in line):
             labels.append(line.split('(')[-1].strip().strip(')'))
     f.close()
     labels += ['Rayleigh', 'Compton']
