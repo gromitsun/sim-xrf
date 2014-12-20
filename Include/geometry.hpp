@@ -21,7 +21,7 @@ private:
 	double _n_photons;
 	double _beam_cross_section;
 public:
-	Illumination(double ev0_ = 1e4, double psi_ = Pi/4, double alpha_ = 0, double n_photons_=1, double beam_cross_section_=1e-12*Pi);
+	Illumination(double ev0_ = 1e4, double psi_ = Pi/4, double alpha_ = 0, double n_photons_=-1, double beam_cross_section_=-1);
 	~Illumination();
 	Illumination & operator=(const Illumination & il);
 	const double & ev0;

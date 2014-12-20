@@ -45,13 +45,16 @@ int main(int argc, char ** argv)
 	std::cout << "Writing output into \"" << output_file << "\"..." << std::endl;
 	std::ofstream fout;
 	fout.open(output_file);
-	
+	// Outputs
 	spec.out(fout);
 	fout << std::endl;
 	ds.out(fout);
+	//Inputs
 	il.out(fout);
 	det.out(fout);
+	omega.out(fout);
+	sp.out(fout);
 	std::cout << "Done!" << std::endl;
-	
+
 	return 0;
 }

@@ -5,7 +5,7 @@ This is a python/C++ program for simulating X-Ray Fluorescence (XRF) spectrum ac
 
 1. Installation
 =======
-The source files need to be compiled with c++11 (tested with g++ version 4.7 and mingw-w64 x86_64-4.9.1-posix-seh-rt_v3-rev1). 
+The source files need to be compiled with C++11 (tested with g++ version 4.7 and mingw-w64 x86_64-4.9.1-posix-seh-rt_v3-rev1). 
 
 Xraylib with python bindings is also needed at compiling.
 
@@ -19,7 +19,7 @@ After compilation of XrayLib, change the "XRL_PATH" in "variables.mk" to the act
 
 1.2. Compiling sim-xrf
 -------
-In the top directory do "make". If your c++ compiler is not called with "g++", modify the variable "g++" in "variables.mk" according to your actual compiler.
+In the top directory do "make". If your C++ compiler is not called with "g++", modify the variable "g++" in "variables.mk" according to your actual compiler.
 
 1.3. Initialization
 -------

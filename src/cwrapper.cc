@@ -82,11 +82,15 @@ void sim(char * input_file,
 	// Save results to file
 	static std::ofstream fout;
 	fout.open(output_file);
+	//Outputs
 	spec.out(fout);
 	fout << std::endl;
 	ds.out(fout);
+	//Inputs
 	il.out(fout);
 	det.out(fout);
+	omega.out(fout);
+	sp.out(fout);
 	fout.close();
 
    	// Return results

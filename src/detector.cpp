@@ -96,10 +96,10 @@ void Channel::show() const
 
 void Channel::out(std::ostream & ost) const
 {
-	ost << "Detector channel parameters:" << std::endl;
-	ost << "\tev_offset = " << ev_offset << std::endl;
-	ost << "\tev_gain = " << ev_gain << std::endl;
-	ost << "\tn_channels = " << n_channels << std::endl;
+	ost << "# Detector channel parameters:" << std::endl;
+	ost << "# \tev_offset = " << ev_offset << std::endl;
+	ost << "# \tev_gain = " << ev_gain << std::endl;
+	ost << "# \tn_channels = " << n_channels << std::endl;
     ost << std::endl;
 }
 
@@ -150,11 +150,11 @@ void Response::show() const
 
 void Response::out(std::ostream & ost) const
 {
-	ost << "Detector response parameters:" << std::endl;
-	ost << "\tfano = " << fano << std::endl;
-	ost << "\tgamma = " << gamma << std::endl;
-	ost << "\tfs = " << fs << std::endl;
-	ost << "\tft = " << ft << std::endl;
+	ost << "# Detector response parameters:" << std::endl;
+	ost << "# \tfano = " << fano << std::endl;
+	ost << "# \tgamma = " << gamma << std::endl;
+	ost << "# \tfs = " << fs << std::endl;
+	ost << "# \tft = " << ft << std::endl;
     ost << std::endl;
 }
 
@@ -194,10 +194,10 @@ void Window::show() const
 
 void Window::out(std::ostream & ost) const
 {
-	ost << "Detector window parameters:" << std::endl;
-	ost << "\tmaterial = " << material << std::endl;
-	ost << "\tthickness = " << thickness << std::endl;
-	ost << "\tdensity = " << density << std::endl;
+	ost << "# Detector window parameters:" << std::endl;
+	ost << "# \tmaterial = " << material << std::endl;
+	ost << "# \tthickness = " << thickness << std::endl;
+	ost << "# \tdensity = " << density << std::endl;
     ost << std::endl;
 }
 

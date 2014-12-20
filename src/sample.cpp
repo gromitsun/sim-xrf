@@ -71,17 +71,17 @@ void Compound::show() const
 
 void Compound::out(std::ostream & ost) const
 {
-	ost << "Z = ";
+	ost << "# \tZ = ";
 	for (auto Z : Z_vec)
 		ost << Z << ", ";
 	ost << std::endl;
 	
-	ost << "p = ";
+	ost << "# \tp = ";
 	for (auto p : p_vec)
 		ost << p << ", ";
 	ost << std::endl;
 	
-	ost << "Molecular weight = ";
+	ost << "# \tMolecular weight = ";
 	ost << molecular_weight;
 	ost << std::endl;
 }
@@ -135,10 +135,10 @@ void Monolayer::show() const
 
 void Monolayer::out(std::ostream & ost) const
 {
-	ost << "Parameters for layer #" << layer << ":" << std::endl;
+	ost << "# Parameters for layer #" << layer << ":" << std::endl;
 	Compound::out(ost);
-	ost << "density = " << density << std::endl;
-	ost << "thickness = " << thickness << std::endl;
+	ost << "# \tDensity = " << density << std::endl;
+	ost << "# \tThickness = " << thickness << std::endl;
 }
 
 //Sample
@@ -183,9 +183,11 @@ void Sample::show() const
 
 void Sample::out(std::ostream & ost) const
 {
+	ost << "# ======================================== #" << std::endl;
 	ost << "# # # # # Sample parameters: # # # # #" << std::endl;
-	ost << "Total number of layers = " << nlayers << std::endl;
+	ost << "# Total number of layers = " << nlayers << std::endl;
 	for (auto m : layer_vec)
 		m.out(ost);
 	ost << "# # # # # End of sample parameters # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 }

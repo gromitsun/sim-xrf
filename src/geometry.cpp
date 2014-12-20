@@ -41,13 +41,15 @@ void Illumination::show() const
 
 void Illumination::out(std::ostream & ost) const
 {
+	ost << "# ======================================== #" << std::endl;
 	ost << "# # # # # Illumination: # # # # #" << std::endl;
-	ost << "ev0 = " << ev0 << std::endl;
-	ost << "psi = " << psi << std::endl;
-	ost << "alpha = " << alpha << std::endl;
-	ost << "Number of incident photons = " << n_photons << std::endl;
-	ost << "Beam cross sectional area = " << beam_cross_section << " cm^2" << std::endl;
+	ost << "# ev0 = " << ev0 << std::endl;
+	ost << "# psi = " << psi << std::endl;
+	ost << "# alpha = " << alpha << std::endl;
+	ost << "# Number of incident photons = " << n_photons << std::endl;
+	ost << "# Beam cross sectional area = " << beam_cross_section << " cm^2" << std::endl;
 	ost << "# # # # # End of illumination # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 	
 }
 
@@ -200,21 +202,25 @@ void solid_angle::show() const
 
 void solid_angle::out(std::ostream & ost) const
 {
-	ost << "angle range: ";
+	ost << "# ======================================== #" << std::endl;
+	ost << "# # # # # Solid angle definition # # # # #" << std::endl;
+	ost << "# angle range: ";
 	for (int i = 0; i < 4; i++)
 		ost << angle_range[i] << ' ';
 	ost << std::endl;
-	ost << "theta_inc = " << _theta_inc << std::endl;
-	ost << "beta_inc = " << _beta_inc << std::endl;
-	ost << "theta: ";
+	ost << "# theta_inc = " << _theta_inc << std::endl;
+	ost << "# beta_inc = " << _beta_inc << std::endl;
+	ost << "# theta: ";
 	for (vector<double>::const_iterator i = theta.begin(); i < theta.end(); i++)
 		ost << *i << ' ';
 	ost << std::endl;
-	ost << "beta: ";
+	ost << "# beta: ";
 	for (vector<double>::const_iterator i = beta.begin(); i < beta.end(); i++)
 		ost << *i << ' ';
 	ost << std::endl;
-	ost << "Total subtended solid angle: " << subtend << std::endl;
+	ost << "# Total subtended solid angle: " << subtend << std::endl;
+	ost << "# # # # # End of solid angle definition # # # # #" << std::endl;
+	ost << "# ======================================== #" << std::endl;
 }
 
 double atten_mono(const double & ev0, 

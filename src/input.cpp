@@ -6,6 +6,7 @@
 
 #include "input.hpp"
 #include "constants.hpp"
+#include "math.hpp"
 
 inline std::string trim_comment(const std::string & s, const std::string & delimiter="#")
 {
@@ -200,7 +201,7 @@ void readfile(std::string filename, Sample & sp, Illumination & il, solid_angle 
 		{
 			std::cout << "Reading in illumination data..." << std::endl;
 			// read illumination
-			double ev0, psi, alpha, n_photons=1, beam_cross_section=1e-12*Pi;
+			double ev0, psi, alpha, n_photons=-1, beam_cross_section=-1;
 			while (getline(fin, s) && !trim(s).empty())
 			{
 				std::string name, value;
@@ -225,6 +226,10 @@ void readfile(std::string filename, Sample & sp, Illumination & il, solid_angle 
 					else if (name == "beam_cross_section")
 					{
 						beam_cross_section = std::stod(value);
+					}
+					else if (name == "beam_diameter")
+					{
+						beam_cross_section = sq(std::stod(value)/2.)*Pi;
 					}
 				}
 				
