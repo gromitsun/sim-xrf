@@ -20,6 +20,8 @@ Xrf::Xrf(double ev0, const Compound & c, double n_photons)
 	std::vector<int> lines_temp;
 	double weight;
 	int Z;
+	if (n_photons < 0)
+		n_photons = 1;
 	_row.push_back(0);
 	for (int i = 0; i < c.Z_vec.size(); i++)
 	{
@@ -226,6 +228,8 @@ Rayleigh::Rayleigh(double ev0_, const Compound & c, const solid_angle & omega_, 
 	_ev0 = ev0_;
 	_omega = omega_;
 	_y_mat.resize(omega.theta.size()*omega.beta.size(),0.0);
+	if (n_photons < 0)
+		n_photons = 1;
 	#pragma omp parallel for collapse(2) if(MP)
 	for (int j = 0; j < omega.theta.size(); j++)
 		for (int k = 0; k < omega.beta.size(); k++)
@@ -334,6 +338,9 @@ Compton::Compton(double ev0_, const Compound & c, const solid_angle & omega_, do
 	_omega = omega_;
 	_y_mat.resize(omega.theta.size()*omega.beta.size(),0.0);
 	double theta, beta;
+
+	if (n_photons < 0)
+		n_photons = 1;
 	
 	// #pragma omp parallel for collapse(2) private(theta, beta) if(MP)
 	// for (int j = 0; j < omega.theta.size(); j++)

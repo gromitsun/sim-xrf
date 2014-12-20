@@ -53,7 +53,8 @@ Illumination:
 	n_photons = 1e10 # Total number of incident photons. Optional, default is -1.
 	beam_cross_section = 3.14e-12 # Beam cross-sectional area, in cm^2. Optional default is -1.
 	beam_diameter = 20e-7 # Beam diameter in cm. Optional. Converted to "beam_cross_section" at input.
-								# Unit incident photon flux density is assumed if either "n_photons" or "beam_cross_section" is non-positive.
+								# Unit number of incident photons (1 photon) is assumed in spectra calculation if "n_photons" is negative.
+								# Unit incident photon flux density is assumed in dose calculation if either "n_photons" or "beam_cross_section" is non-positive.
 
 Solid angle:
 	angle_range = 80, 100, 0, 180 # Angle range of the detector active part. [theta_begin, theta_end, beta_begin, beta_end]. In deg.
