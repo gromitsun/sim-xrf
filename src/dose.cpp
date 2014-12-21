@@ -73,7 +73,7 @@ void Dose::out(std::ostream & ost) const
 			<< "(d = " << std::sqrt(beam_cross_section/Pi)*2e7 << " nm):" << std::endl;
 	}
 	else
-		ost << "# Dose per incident photon flux density (1 photon/cm^2)" << std::endl;
+		ost << "# Dose per incident photon number density (1 photon/cm^2)" << std::endl;
 	for (int i=0; i<dose_vec.size(); i++)
 	    ost << "# \tLayer #" << i+1 << ":\t" << dose_vec[i] << " Gy" << std::endl;
 	ost << "# \tTotal:\t" << total_dose << " Gy" << std::endl;
