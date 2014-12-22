@@ -43,7 +43,7 @@ int main(int argc, char ** argv)
 
 	// Save results to file
 	std::cout << "Writing output into \"" << output_file << "\"..." << std::endl;
-	std::ofstream fout;
+	static std::ofstream fout;
 	fout.open(output_file);
 	// Outputs
 	spec.out(fout);
