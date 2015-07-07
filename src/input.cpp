@@ -71,7 +71,7 @@ inline bool parse_parameter(const std::string & line, std::string & name, std::s
 		return false;
 	else
 	{
-		name = trim(line.substr(0, pos-1));
+		name = trim(line.substr(0, pos));
 		value = trim(line.substr(pos+1));
 		return true;
 	}
